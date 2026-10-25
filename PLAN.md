@@ -60,11 +60,11 @@ Bị conflict khi mở PR → `git pull origin develop` ngay trên nhánh của 
 ### S1-L0 · Phú · Chuẩn bị repo & môi trường
 - [ ] C-01 Đổi nhánh `master` → `main`, tạo `develop`; trên GitHub: đặt `develop` làm nhánh mặc định, bật bảo vệ `main` (bắt buộc PR); mời Sithiphak, Khanxay làm collaborator
 - [x] C-02 `.env.example`: `APP_NAME=TechShop`, `APP_LOCALE=vi`, `APP_FAKER_LOCALE=vi_VN`, `DB_CONNECTION=mysql`, `DB_DATABASE=techshop`, `DB_USERNAME=root`, `DB_PASSWORD=` _(đã sửa sẵn – mỗi người tự sửa `.env` của mình theo, tạo DB `techshop` trong MySQL)_
-- [ ] C-03 Gỡ Tailwind, dùng Bootstrap 5.3 – **đã sửa sẵn** `package.json`, `vite.config.js`, `resources/css/app.css`, `resources/js/app.js`; còn: xóa `node_modules`, chạy `npm install` rồi `npm run build` để xác nhận build được (trang `welcome` mặc định sẽ vỡ giao diện – bình thường, S1-L4 thay bằng trang chủ)
-- [ ] C-04 Tạo `lang/vi/validation.php` (thông báo tiếng Việt, có `attributes` cho các trường ở CLAUDE.md mục 7)
-- [ ] C-05 Blade directive `@money($v)` trong `AppServiceProvider`; `php artisan storage:link`
-- [ ] C-06 README: yêu cầu máy (PHP ≥ 8.3 bật `pdo_mysql`, `mbstring`, `fileinfo`, `openssl`, `curl`, `zip`, `intl`; Composer 2; Node ≥ 20.19; MySQL 8) và các bước cài cho thành viên (clone, `composer install`, `npm install`, copy `.env`, tạo DB `techshop`, `key:generate`, `migrate:fresh --seed`, `storage:link`, `composer run dev`)
-- [ ] C-07 Commit `CLAUDE.md`, `PLAN.md`, `AGENTS.md`
+- [x] C-03 Gỡ Tailwind, dùng Bootstrap 5.3 – **đã sửa sẵn** `package.json`, `vite.config.js`, `resources/css/app.css`, `resources/js/app.js`; còn: xóa `node_modules`, chạy `npm install` rồi `npm run build` để xác nhận build được (trang `welcome` mặc định sẽ vỡ giao diện – bình thường, S1-L4 thay bằng trang chủ)
+- [x] C-04 Tạo `lang/vi/validation.php` (thông báo tiếng Việt, có `attributes` cho các trường ở CLAUDE.md mục 7)
+- [x] C-05 Blade directive `@money($v)` trong `AppServiceProvider`; `php artisan storage:link`
+- [x] C-06 README: yêu cầu máy (PHP ≥ 8.3 bật `pdo_mysql`, `mbstring`, `fileinfo`, `openssl`, `curl`, `zip`, `intl`; Composer 2; Node ≥ 20.19; MySQL 8) và các bước cài cho thành viên (clone, `composer install`, `npm install`, copy `.env`, tạo DB `techshop`, `key:generate`, `migrate:fresh --seed`, `storage:link`, `composer run dev`)
+- [x] C-07 Commit `CLAUDE.md`, `PLAN.md`, `AGENTS.md`
 
 **Cách kiểm tra:** cả 3 máy clone được, `php artisan serve` mở được trang chủ mặc định, Bootstrap đã nạp (F12 → không còn class Tailwind).
 
@@ -212,3 +212,14 @@ _(Mỗi lượt ghi thêm 1 mục ở cuối, KHÔNG xóa mục cũ)_
 - Lưu ý: ...
 - Còn dở: (không)
 -->
+
+### S1-L0 · Phú · 25/10
+- Đã xong: C-02, C-03 (`npm run build` OK), C-04, C-05, C-06, C-07 (điều chỉnh – xem lưu ý); C-01 phần Git local + push nhánh `main`, `develop`
+- File chính: `lang/vi/validation.php`, `app/Providers/AppServiceProvider.php` (`@money`), `tests/Feature/MoneyDirectiveTest.php`, `README.md`, `phpunit.xml` (thêm `APP_LOCALE=vi` để test luôn chạy tiếng Việt), `.gitignore`
+- Người sau cần chạy: `git checkout develop && git pull origin develop`, `npm install`, `php artisan storage:link`; sửa `.env` theo `.env.example` (`APP_LOCALE=vi`, MySQL `techshop`)
+- Lưu ý:
+  - **CLAUDE.md không còn nằm trong Git** (theo yêu cầu của Phú – đã `git rm --cached` + thêm vào `.gitignore`). Bản cũ trên repo là hướng dẫn mặc định của Laravel Boost, sai luật nhóm. Mỗi người nhận CLAUDE.md từ Phú qua Zalo, đặt ở thư mục gốc repo. Khi pull lần đầu, Git sẽ xóa CLAUDE.md cũ trong máy → chép bản mới vào sau khi pull.
+  - Nhánh `main` vẫn còn CLAUDE.md bản Boost (commit khởi tạo) đến khi merge `develop` → `main` ở S1-L7.
+  - `lang/vi/validation.php` có sẵn `custom` cho `phone`, `receiver_phone` (regex) và `sale_price` (lt) – Form Request không cần tự viết `messages()` cho các lỗi này.
+  - Hiển thị tiền trong Blade: `@money($product->final_price)` → `1.500.000đ`.
+- Còn dở: C-01 phần trên GitHub (Phú làm tay): đặt `develop` làm nhánh mặc định, xóa nhánh `master` trên remote, bảo vệ `main`, mời collaborator. Làm xong thì đánh ✅ C-01.
