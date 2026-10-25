@@ -8,12 +8,14 @@
 Mỗi sprint được chia thành các **lượt** chạy **lần lượt**. Mỗi lượt có **1 người** làm:
 
 ```
-pull develop  →  nhờ AI code các task của lượt  →  test pass  →  push + PR  →  Phú merge  →  người kế tiếp pull
+pull main về nhánh mình  →  nhờ AI code các task của lượt  →  test pass  →  push nhánh mình + PR vào main  →  Phú merge  →  người kế tiếp pull main
 ```
 
-- Lượt sau **chỉ bắt đầu khi PR của lượt trước đã merge vào `develop`** (trừ khi cột "Phụ thuộc" ghi "không").
+- **Mỗi người 1 nhánh cố định:** `phu`, `sithiphak`, `khanxay`. Không tạo thêm nhánh khác. `main` chỉ nhận code qua PR.
+- **Đầu mỗi lượt bắt buộc `git pull origin main`** trên nhánh của mình – nhánh riêng không tự có code của người khác.
+- Lượt sau **chỉ bắt đầu khi PR của lượt trước đã merge vào `main`** (trừ khi cột "Phụ thuộc" ghi "không").
 - N1, N2… = ngày thứ 1, 2… tính từ sau buổi học trước. Đây là ngày gợi ý, nhóm có thể dời nhưng **giữ thứ tự**.
-- Phú review & merge PR (PR của chính Phú thì Sithiphak xem qua rồi Phú merge). Nếu Phú bận quá 12 giờ, người làm được tự merge khi `php artisan test` pass.
+- Phú review & merge PR (PR của chính Phú thì Sithiphak xem qua rồi Phú merge). Nếu Phú bận quá 12 giờ, người làm được tự merge khi `php artisan test` pass. Merge chọn **"Create a merge commit"** (không dùng "Squash and merge" – sẽ mất commit của từng người).
 - Lượt làm không xong: vẫn push nhánh, ghi "còn dở" trong Nhật ký bàn giao, báo nhóm Zalo. Người sau làm tiếp nếu lượt của họ không phụ thuộc.
 - Xong mỗi lượt: người làm cập nhật trạng thái task trong file Excel Kế hoạch Agile và ghi nhật ký thực hiện đề tài.
 
@@ -21,21 +23,27 @@ pull develop  →  nhờ AI code các task của lượt  →  test pass  →  p
 
 ```
 Đọc CLAUDE.md và PLAN.md. Tôi là <Tên>, hôm nay làm lượt <S1-L3>.
-Hãy pull develop, kiểm tra Nhật ký bàn giao, rồi làm lần lượt từng task của lượt này,
-commit sau mỗi task. Xong thì chạy pint + test, cập nhật PLAN.md, push và hướng dẫn tôi mở PR.
+Hãy chuyển sang nhánh của tôi, pull main, kiểm tra Nhật ký bàn giao, rồi làm lần lượt từng task của lượt này,
+commit sau mỗi task. Xong thì chạy pint + test, cập nhật PLAN.md, push và hướng dẫn tôi mở PR vào main.
 Giải thích ngắn cho tôi từng phần để tôi trình bày được với thầy.
 ```
 
 ### Lệnh Git cơ bản (Windows, Git Bash / Terminal VS Code)
 
 ```bash
-git checkout develop && git pull origin develop       # lấy code mới nhất
-git checkout -b feature/s1-l3-auth                    # tạo nhánh cho lượt
-git add . && git commit -m "feat(auth): ... [T-01]"   # commit
-git push -u origin feature/s1-l3-auth                 # đẩy lên, rồi mở PR trên GitHub vào develop
+# Lần đầu (chỉ 1 lần): tạo nhánh của mình từ main
+git checkout main && git pull origin main
+git checkout -b khanxay                               # thay bằng tên mình: phu / sithiphak / khanxay
+git push -u origin khanxay
+
+# Mỗi lượt
+git checkout khanxay
+git pull origin main                                  # lấy code mới nhất đã được duyệt
+git add <file> && git commit -m "feat(auth): ... [T-01]"   # commit
+git push origin khanxay                               # đẩy lên, rồi mở PR khanxay → main trên GitHub
 ```
 
-Bị conflict khi mở PR → `git pull origin develop` ngay trên nhánh của mình, nhờ AI gộp conflict giúp, chạy lại test rồi push.
+Bị conflict khi mở PR → `git pull origin main` ngay trên nhánh của mình, nhờ AI gộp conflict giúp, chạy lại test rồi push.
 
 ---
 
@@ -58,7 +66,7 @@ Bị conflict khi mở PR → `git pull origin develop` ngay trên nhánh của 
 > L4 và L5 sửa file khác nhau nên có thể làm song song nếu bị trễ.
 
 ### S1-L0 · Phú · Chuẩn bị repo & môi trường
-- [ ] C-01 Đổi nhánh `master` → `main`, tạo `develop`; trên GitHub: đặt `develop` làm nhánh mặc định, bật bảo vệ `main` (bắt buộc PR); mời Sithiphak, Khanxay làm collaborator
+- [ ] C-01 Đổi nhánh `master` → `main`, tạo nhánh `phu`; trên GitHub: `main` là nhánh mặc định, xóa `master`, bật bảo vệ `main` (bắt buộc PR); mời Sithiphak, Khanxay làm collaborator
 - [x] C-02 `.env.example`: `APP_NAME=TechShop`, `APP_LOCALE=vi`, `APP_FAKER_LOCALE=vi_VN`, `DB_CONNECTION=mysql`, `DB_DATABASE=techshop`, `DB_USERNAME=root`, `DB_PASSWORD=` _(đã sửa sẵn – mỗi người tự sửa `.env` của mình theo, tạo DB `techshop` trong MySQL)_
 - [x] C-03 Gỡ Tailwind, dùng Bootstrap 5.3 – **đã sửa sẵn** `package.json`, `vite.config.js`, `resources/css/app.css`, `resources/js/app.js`; còn: xóa `node_modules`, chạy `npm install` rồi `npm run build` để xác nhận build được (trang `welcome` mặc định sẽ vỡ giao diện – bình thường, S1-L4 thay bằng trang chủ)
 - [x] C-04 Tạo `lang/vi/validation.php` (thông báo tiếng Việt, có `attributes` cho các trường ở CLAUDE.md mục 7)
@@ -120,10 +128,10 @@ Bị conflict khi mở PR → `git pull origin develop` ngay trên nhánh của 
 **Cách kiểm tra:** `/san-pham?q=tai&category=tai-nghe&min_price=200000&sort=price_asc` ra đúng, sang trang 2 vẫn giữ bộ lọc.
 
 ### S1-L7 · Phú · Tích hợp Sprint 1
-- [ ] I-01 Pull `develop`, `migrate:fresh --seed`, `php artisan test` pass toàn bộ
+- [ ] I-01 Pull `main`, `migrate:fresh --seed`, `php artisan test` pass toàn bộ
 - [ ] I-02 Chạy kịch bản demo: admin thêm danh mục, SP có ảnh → khách đăng ký, đăng nhập, lọc, xem chi tiết; khách bị chặn `/admin`
 - [ ] I-03 Sửa lỗi tích hợp nhỏ (lỗi lớn → ghi Nhật ký, giao lại người phụ trách)
-- [ ] I-04 Merge `develop` → `main`, gắn tag `v0.1-sprint1`; ghi "Kết quả demo" vào sheet Sprint 1
+- [ ] I-04 Gắn tag `v0.1-sprint1` trên `main`; ghi "Kết quả demo" vào sheet Sprint 1
 
 ---
 
@@ -177,7 +185,7 @@ Bị conflict khi mở PR → `git pull origin develop` ngay trên nhánh của 
 - [ ] I-08 `migrate:fresh --seed`, `php artisan test` pass toàn bộ
 - [ ] I-09 Chạy kịch bản demo GK2: thêm giỏ → checkout COD → admin xác nhận → đang giao → hoàn thành → khách thấy trạng thái; thử hủy đơn pending → kho được cộng lại
 - [ ] I-10 Điền bảng go/no-go (mục cuối file này) cùng cả nhóm; cập nhật backlog Sprint 3 nếu phải cắt phạm vi
-- [ ] I-11 Merge `develop` → `main`, tag `v0.2-sprint2`
+- [ ] I-11 Gắn tag `v0.2-sprint2` trên `main`
 
 ---
 
@@ -214,12 +222,12 @@ _(Mỗi lượt ghi thêm 1 mục ở cuối, KHÔNG xóa mục cũ)_
 -->
 
 ### S1-L0 · Phú · 25/10
-- Đã xong: C-02, C-03 (`npm run build` OK), C-04, C-05, C-06, C-07 (điều chỉnh – xem lưu ý); C-01 phần Git local + push nhánh `main`, `develop`
+- Đã xong: C-02, C-03 (`npm run build` OK), C-04, C-05, C-06, C-07 (điều chỉnh – xem lưu ý); C-01 phần Git local + push nhánh `main`, `phu`
 - File chính: `lang/vi/validation.php`, `app/Providers/AppServiceProvider.php` (`@money`), `tests/Feature/MoneyDirectiveTest.php`, `README.md`, `phpunit.xml` (thêm `APP_LOCALE=vi` để test luôn chạy tiếng Việt), `.gitignore`
-- Người sau cần chạy: `git checkout develop && git pull origin develop`, `npm install`, `php artisan storage:link`; sửa `.env` theo `.env.example` (`APP_LOCALE=vi`, MySQL `techshop`)
+- Người sau cần chạy: `git checkout main && git pull origin main`, tạo nhánh của mình (`git checkout -b sithiphak` / `khanxay`, push lên), `npm install`, `php artisan storage:link`; sửa `.env` theo `.env.example` (`APP_LOCALE=vi`, MySQL `techshop`)
 - Lưu ý:
   - **CLAUDE.md không còn nằm trong Git** (theo yêu cầu của Phú – đã `git rm --cached` + thêm vào `.gitignore`). Bản cũ trên repo là hướng dẫn mặc định của Laravel Boost, sai luật nhóm. Mỗi người nhận CLAUDE.md từ Phú qua Zalo, đặt ở thư mục gốc repo. Khi pull lần đầu, Git sẽ xóa CLAUDE.md cũ trong máy → chép bản mới vào sau khi pull.
-  - Nhánh `main` vẫn còn CLAUDE.md bản Boost (commit khởi tạo) đến khi merge `develop` → `main` ở S1-L7.
+  - **Đổi quy trình Git (Phú quyết định 25/10):** bỏ `develop` và nhánh `feature/<sprint>-<lượt>-...`; mỗi người 1 nhánh cố định (`phu`, `sithiphak`, `khanxay`), PR thẳng vào `main`. Đã sửa PLAN.md mục 0 và I-01, I-04, I-11; CLAUDE.md mục 10 do Phú tự sửa.
   - `lang/vi/validation.php` có sẵn `custom` cho `phone`, `receiver_phone` (regex) và `sale_price` (lt) – Form Request không cần tự viết `messages()` cho các lỗi này.
   - Hiển thị tiền trong Blade: `@money($product->final_price)` → `1.500.000đ`.
-- Còn dở: C-01 phần trên GitHub (Phú làm tay): đặt `develop` làm nhánh mặc định, xóa nhánh `master` trên remote, bảo vệ `main`, mời collaborator. Làm xong thì đánh ✅ C-01.
+- Còn dở: C-01 phần trên GitHub (Phú làm tay): đặt `main` làm nhánh mặc định, xóa nhánh `master` trên remote, bảo vệ `main`, mời collaborator. Làm xong thì đánh ✅ C-01.

@@ -22,10 +22,11 @@ Kiểm tra extension PHP: `php -m`.
 ## 2. Cài đặt lần đầu
 
 ```bash
-# 1. Clone và chuyển sang nhánh develop
+# 1. Clone và tạo nhánh riêng của mình (phu / sithiphak / khanxay)
 git clone https://github.com/vietphubdp/techshop.git
 cd techshop
-git checkout develop
+git checkout -b khanxay
+git push -u origin khanxay
 
 # 2. Cài thư viện
 composer install
@@ -62,12 +63,13 @@ Tài khoản admin mẫu (có sau lượt S1-L1): `admin@techshop.test` / `passw
 ## 3. Mỗi lần bắt đầu làm việc
 
 ```bash
-git checkout develop
-git pull origin develop
-composer install && npm install        # khi composer.lock / package-lock.json thay đổi
+git checkout khanxay                    # nhánh của mình
+git pull origin main                    # lấy code mới nhất đã được duyệt
+composer install && npm install         # khi composer.lock / package-lock.json thay đổi
 php artisan migrate                     # hoặc migrate:fresh --seed nếu lượt trước đổi migration/seeder
-git checkout -b feature/<sprint>-<lượt>-<tên>   # VD: feature/s1-l3-auth
 ```
+
+Làm xong: `git push origin khanxay` rồi mở Pull Request `khanxay → main` trên GitHub để Phú duyệt.
 
 Quy trình commit, PR: xem `CLAUDE.md` mục 10 và `PLAN.md` mục 0.
 
