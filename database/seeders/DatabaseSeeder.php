@@ -15,11 +15,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Tài khoản tối thiểu để đăng nhập thử; dữ liệu demo đầy đủ bổ sung ở C-11
+        User::factory()->admin()->create([
+            'name' => 'Quản trị viên',
+            'email' => 'admin@techshop.test',
+        ]);
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Khách hàng mẫu',
+            'email' => 'khach@techshop.test',
         ]);
     }
 }
