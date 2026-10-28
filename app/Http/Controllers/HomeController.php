@@ -9,7 +9,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // TODO [T-08]: thay bằng view shop.home
-        return view('welcome');
+        // TODO [T-08]: lấy SP mới, SP khuyến mãi
+        return view('shop.home');
     }
 }
