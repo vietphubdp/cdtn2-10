@@ -2,3 +2,16 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 /* CSS riêng của TechShop: chỉ viết khi class Bootstrap không đáp ứng được */
+
+/* Layout quản trị: sidebar rộng 240px ở màn hình lớn (≥ 992px); màn hình nhỏ sidebar thành offcanvas */
+@media (min-width: 992px) {
+    .admin-sidebar {
+        width: 240px;
+        flex-shrink: 0;
+        background-color: var(--bs-dark);
+    }
+}
+
+.min-w-0 {
+    min-width: 0;
+}
