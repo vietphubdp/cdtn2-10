@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -12,13 +13,31 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO [T-10, T-11, T-12]: tìm theo tên, lọc danh mục + khoảng giá, sắp xếp
+        // Tham số sai kiểu (vd. ?q[]=...) hoặc giá nhập sai (chữ, số âm) coi như không lọc
+        $q = is_string($request->query('q')) ? trim($request->query('q')) : '';
+        $categorySlug = is_string($request->query('category')) ? $request->query('category') : '';
+        $minPrice = $request->integer('min_price') > 0 ? $request->integer('min_price') : null;
+        $maxPrice = $request->integer('max_price') > 0 ? $request->integer('max_price') : null;
+        $sort = in_array($request->query('sort'), ['price_asc', 'price_desc'], true) ? $request->query('sort') : 'latest';
+
+        $categories = Category::orderBy('name')->get();
+        $currentCategory = $categories->firstWhere('slug', $categorySlug);
+
+        // Giá bán = giá KM nếu có, ngược lại giá gốc (BR-01) → lọc và sắp xếp theo giá bán
+        $finalPrice = 'COALESCE(sale_price, price)';
+
         $products = Product::active()
+            ->when($q !== '', fn ($query) => $query->where('name', 'like', '%'.$q.'%'))
+            ->when($categorySlug !== '', fn ($query) => $query->whereHas('category', fn ($c) => $c->where('slug', $categorySlug)))
+            ->when($minPrice, fn ($query) => $query->whereRaw("$finalPrice >= ?", [$minPrice]))
+            ->when($maxPrice, fn ($query) => $query->whereRaw("$finalPrice <= ?", [$maxPrice]))
+            ->when($sort === 'price_asc', fn ($query) => $query->orderByRaw("$finalPrice asc"))
+            ->when($sort === 'price_desc', fn ($query) => $query->orderByRaw("$finalPrice desc"))
             ->latest('id')
             ->paginate(12)
             ->withQueryString();
 
-        return view('shop.products.index', compact('products'));
+        return view('shop.products.index', compact('products', 'categories', 'currentCategory', 'q', 'minPrice', 'maxPrice', 'sort'));
     }
 
     /**
