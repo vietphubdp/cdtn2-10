@@ -26,6 +26,15 @@ class ProductController extends Controller
      */
     public function show(string $slug)
     {
-        abort(501); // TODO [T-14, T-15]
+        // Chỉ tìm trong SP đang bán: SP ẩn hoặc slug sai → 404 (BR-02)
+        $product = Product::active()
+            ->with('category')
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        // Đánh giá chỉ hiển thị; form viết đánh giá làm ở FR-12
+        $reviews = $product->reviews()->with('user')->latest('id')->get();
+
+        return view('shop.products.show', compact('product', 'reviews'));
     }
 }
