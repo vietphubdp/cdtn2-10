@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -11,7 +12,13 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        abort(501); // TODO [T-09, T-10, T-11, T-12]
+        // TODO [T-10, T-11, T-12]: tìm theo tên, lọc danh mục + khoảng giá, sắp xếp
+        $products = Product::active()
+            ->latest('id')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('shop.products.index', compact('products'));
     }
 
     /**
