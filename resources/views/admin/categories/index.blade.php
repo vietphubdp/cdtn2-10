@@ -5,13 +5,6 @@
 @section('content')
     <h1 class="h3 mb-4">Danh mục</h1>
 
-    @if (session('success'))
-        <div class="alert alert-success" role="alert">{{ session('success') }}</div>
-    @endif
-    @if (session('error'))
-        <div class="alert alert-danger" role="alert">{{ session('error') }}</div>
-    @endif
-
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card shadow-sm">

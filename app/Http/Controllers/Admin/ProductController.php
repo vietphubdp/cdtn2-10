@@ -18,12 +18,28 @@ class ProductController extends Controller
 {
     public function __construct(private ImageService $images) {}
 
+    /**
+     * Danh sách SP (gồm cả SP ẩn): tìm theo tên, lọc danh mục và trạng thái hiển thị.
+     */
     public function index(Request $request)
     {
-        // TODO [T-21]: tìm theo tên, lọc danh mục/trạng thái, nút Ẩn/Hiện, Xóa
-        $products = Product::with('category')->latest('id')->paginate(20);
+        // Tham số sai kiểu hoặc giá trị lạ coi như không lọc
+        $q = is_string($request->query('q')) ? trim($request->query('q')) : '';
+        $categoryId = $request->integer('category_id');
+        $status = in_array($request->query('status'), ['active', 'hidden'], true) ? $request->query('status') : '';
 
-        return view('admin.products.index', compact('products'));
+        $products = Product::with('category')
+            ->withExists('orderItems') // order_items_exists: SP đã có trong đơn thì không hiện nút Xóa
+            ->when($q !== '', fn ($query) => $query->where('name', 'like', '%'.$q.'%'))
+            ->when($categoryId > 0, fn ($query) => $query->where('category_id', $categoryId))
+            ->when($status !== '', fn ($query) => $query->where('is_active', $status === 'active'))
+            ->latest('id')
+            ->paginate(20)
+            ->withQueryString();
+
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.products.index', compact('products', 'categories', 'q', 'categoryId', 'status'));
     }
 
     public function create()
@@ -74,9 +90,31 @@ class ProductController extends Controller
             ->with('success', 'Đã cập nhật sản phẩm "'.$product->name.'".');
     }
 
+    /**
+     * Ẩn/hiện SP với khách (BR-02). Quay lại đúng trang đang xem để giữ bộ lọc.
+     */
+    public function toggleActive(Product $product)
+    {
+        $product->update(['is_active' => ! $product->is_active]);
+
+        $message = $product->is_active
+            ? 'Đã hiện sản phẩm "'.$product->name.'".'
+            : 'Đã ẩn sản phẩm "'.$product->name.'" khỏi trang khách.';
+
+        return back()->with('success', $message);
+    }
+
     public function destroy(Product $product)
     {
-        abort(501); // TODO [T-21]
+        // SP đã nằm trong đơn thì chỉ được ẩn, không xóa (order_items RESTRICT)
+        if ($product->orderItems()->exists()) {
+            return back()->with('error', 'Không thể xóa "'.$product->name.'": sản phẩm đã có trong đơn hàng, chỉ có thể ẩn.');
+        }
+
+        $product->delete();
+        $this->images->delete($product->image);
+
+        return back()->with('success', 'Đã xóa sản phẩm "'.$product->name.'".');
     }
 
     private function formView(Product $product)
