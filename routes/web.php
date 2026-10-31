@@ -63,6 +63,7 @@ Route::middleware(['auth', 'not_locked', 'role:admin'])->prefix('admin')->name('
 
     Route::resource('categories', Admin\CategoryController::class)->except('show');
     Route::resource('products', Admin\ProductController::class)->except('show');
+    Route::patch('/products/{product}/active', [Admin\ProductController::class, 'toggleActive'])->name('products.active');
 
     Route::get('/orders', [Admin\OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [Admin\OrderController::class, 'show'])->name('orders.show');

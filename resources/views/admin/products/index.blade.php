@@ -8,6 +8,34 @@
         <a href="{{ route('admin.products.create') }}" class="btn btn-dark">+ Thêm sản phẩm</a>
     </div>
 
+    {{-- Tìm theo tên, lọc danh mục và trạng thái (Hình 14) --}}
+    <form action="{{ route('admin.products.index') }}" method="GET" class="row g-2 mb-3">
+        <div class="col-12 col-md">
+            <input type="search" name="q" value="{{ $q }}" class="form-control" placeholder="Tìm theo tên..." aria-label="Tìm theo tên">
+        </div>
+        <div class="col-6 col-md-auto">
+            <select name="category_id" class="form-select" aria-label="Danh mục">
+                <option value="">Tất cả danh mục</option>
+                @foreach ($categories as $category)
+                    <option value="{{ $category->id }}" @selected($categoryId === $category->id)>{{ $category->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-6 col-md-auto">
+            <select name="status" class="form-select" aria-label="Trạng thái">
+                <option value="">Tất cả trạng thái</option>
+                <option value="active" @selected($status === 'active')>Đang hiện</option>
+                <option value="hidden" @selected($status === 'hidden')>Đang ẩn</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-auto d-flex gap-2">
+            <button type="submit" class="btn btn-outline-dark">Lọc</button>
+            @if ($q !== '' || $categoryId > 0 || $status !== '')
+                <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">Bỏ lọc</a>
+            @endif
+        </div>
+    </form>
+
     <div class="card shadow-sm">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -50,17 +78,36 @@
                             </td>
                             <td class="text-end text-nowrap">
                                 <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-primary">Sửa</a>
+
+                                <form method="POST" action="{{ route('admin.products.active', $product) }}" class="d-inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">{{ $product->is_active ? 'Ẩn' : 'Hiện' }}</button>
+                                </form>
+
+                                {{-- SP đã có trong đơn chỉ được ẩn, không có nút Xóa --}}
+                                @unless ($product->order_items_exists)
+                                    <form method="POST" action="{{ route('admin.products.destroy', $product) }}" class="d-inline"
+                                          onsubmit="return confirm(@js('Xóa sản phẩm "'.$product->name.'"?'))">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                                    </form>
+                                @endunless
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-secondary py-4">Chưa có sản phẩm nào.</td>
+                            <td colspan="7" class="text-center text-secondary py-4">
+                                {{ $q !== '' || $categoryId > 0 || $status !== '' ? 'Không có sản phẩm phù hợp bộ lọc.' : 'Chưa có sản phẩm nào.' }}
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
+    <p class="small text-secondary mt-2 mb-0">Nút "Xóa" chỉ có với sản phẩm chưa nằm trong đơn nào; sản phẩm đã bán chỉ có thể ẩn.</p>
 
     <div class="mt-3">
         {{ $products->links('pagination::bootstrap-5') }}
