@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -241,5 +242,126 @@ class AdminProductTest extends TestCase
 
         $this->assertSame('products/cu.jpg', $product->fresh()->image);
         Storage::disk('public')->assertExists('products/cu.jpg');
+    }
+
+    public function test_admin_searches_products_by_name(): void
+    {
+        Product::factory()->create(['name' => 'Tai nghe Sony A1']);
+        Product::factory()->create(['name' => 'Cáp Lightning 1m']);
+
+        $this->actingAs($this->admin())
+            ->get(route('admin.products.index', ['q' => 'sony']))
+            ->assertOk()
+            ->assertSee('Tai nghe Sony A1')
+            ->assertDontSee('Cáp Lightning 1m');
+    }
+
+    public function test_admin_filters_by_category_and_status(): void
+    {
+        $headphones = Category::factory()->create();
+        Product::factory()->create(['category_id' => $headphones->id, 'name' => 'Tai nghe đang bán']);
+        Product::factory()->hidden()->create(['category_id' => $headphones->id, 'name' => 'Tai nghe ngừng bán']);
+        Product::factory()->hidden()->create(['name' => 'Ốp lưng ngừng bán']);
+
+        $this->actingAs($this->admin())
+            ->get(route('admin.products.index', ['category_id' => $headphones->id, 'status' => 'hidden']))
+            ->assertOk()
+            ->assertSee('Tai nghe ngừng bán')
+            ->assertDontSee('Tai nghe đang bán')
+            ->assertDontSee('Ốp lưng ngừng bán');
+    }
+
+    public function test_filter_is_kept_when_changing_page(): void
+    {
+        $category = Category::factory()->create();
+        Product::factory()->count(21)->create(['category_id' => $category->id]);
+
+        $this->actingAs($this->admin())
+            ->get(route('admin.products.index', ['category_id' => $category->id]))
+            ->assertOk()
+            ->assertSee('category_id='.$category->id.'&amp;page=2', false);
+    }
+
+    public function test_invalid_filter_values_are_ignored(): void
+    {
+        Product::factory()->create(['name' => 'Tai nghe Sony A1']);
+
+        $this->actingAs($this->admin())
+            ->get(route('admin.products.index', ['status' => 'abc', 'category_id' => 'xyz', 'q' => ['mang']]))
+            ->assertOk()
+            ->assertSee('Tai nghe Sony A1');
+    }
+
+    public function test_admin_hides_product_and_customer_no_longer_sees_it(): void
+    {
+        $product = Product::factory()->create(['name' => 'Tai nghe Sony A1']);
+
+        $this->actingAs($this->admin())
+            ->from(route('admin.products.index', ['q' => 'sony']))
+            ->patch(route('admin.products.active', $product))
+            ->assertRedirect(route('admin.products.index', ['q' => 'sony']))
+            ->assertSessionHas('success');
+
+        $this->assertFalse($product->fresh()->is_active);
+
+        // BR-02: SP ẩn không có trên trang khách, mở link chi tiết → 404
+        auth()->logout();
+        $this->get(route('products.index'))->assertDontSee(route('products.show', $product->slug));
+        $this->get(route('products.show', $product->slug))->assertNotFound();
+    }
+
+    public function test_admin_shows_hidden_product_again(): void
+    {
+        $product = Product::factory()->hidden()->create();
+
+        $this->actingAs($this->admin())
+            ->patch(route('admin.products.active', $product))
+            ->assertSessionHas('success');
+
+        $this->assertTrue($product->fresh()->is_active);
+    }
+
+    public function test_admin_deletes_unsold_product_and_its_image(): void
+    {
+        Storage::disk('public')->put('products/anh.jpg', 'anh');
+        $product = Product::factory()->create(['image' => 'products/anh.jpg']);
+
+        $this->actingAs($this->admin())
+            ->from(route('admin.products.index'))
+            ->delete(route('admin.products.destroy', $product))
+            ->assertRedirect(route('admin.products.index'))
+            ->assertSessionHas('success');
+
+        $this->assertModelMissing($product);
+        Storage::disk('public')->assertMissing('products/anh.jpg');
+    }
+
+    public function test_sold_product_has_no_delete_button_and_cannot_be_deleted(): void
+    {
+        $sold = Product::factory()->create();
+        OrderItem::factory()->create(['product_id' => $sold->id]);
+        $unsold = Product::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get(route('admin.products.index'))
+            ->assertSee('action="'.route('admin.products.destroy', $unsold).'"', false)
+            ->assertDontSee('action="'.route('admin.products.destroy', $sold).'"', false);
+
+        $this->delete(route('admin.products.destroy', $sold))
+            ->assertSessionHas('error');
+
+        $this->assertModelExists($sold);
+    }
+
+    public function test_customer_cannot_hide_or_delete_product(): void
+    {
+        $product = Product::factory()->create();
+
+        $this->actingAs(User::factory()->create());
+        $this->patch(route('admin.products.active', $product))->assertForbidden();
+        $this->delete(route('admin.products.destroy', $product))->assertForbidden();
+
+        $this->assertTrue($product->fresh()->is_active);
+        $this->assertModelExists($product);
     }
 }
