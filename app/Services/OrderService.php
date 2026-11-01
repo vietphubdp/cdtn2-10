@@ -84,4 +84,50 @@ class OrderService
             return $order;
         });
     }
+
+    /**
+     * Hủy đơn và cộng lại tồn kho (BR-06). Dùng cho cả khách và admin;
+     * controller phía khách tự kiểm tra thêm canBeCancelledByCustomer() (chỉ đơn pending).
+     */
+    public function cancel(Order $order): Order
+    {
+        return DB::transaction(function () use ($order) {
+            // Đọc lại trạng thái mới nhất và khóa đơn để không hoàn kho 2 lần
+            $order = Order::lockForUpdate()->findOrFail($order->id);
+
+            if (! $order->status->canTransitionTo(OrderStatus::Cancelled)) {
+                throw new BusinessException('Không thể hủy đơn '.$order->code.' ở trạng thái "'.$order->status->label().'".');
+            }
+
+            $order->update(['status' => OrderStatus::Cancelled]);
+
+            foreach ($order->items as $item) {
+                Product::whereKey($item->product_id)->increment('stock', $item->quantity);
+            }
+
+            return $order;
+        });
+    }
+
+    /**
+     * Admin đổi trạng thái đơn theo BR-05; chọn "Đã hủy" thì đi qua cancel() để hoàn kho.
+     */
+    public function changeStatus(Order $order, OrderStatus $status): Order
+    {
+        if ($status === OrderStatus::Cancelled) {
+            return $this->cancel($order);
+        }
+
+        return DB::transaction(function () use ($order, $status) {
+            $order = Order::lockForUpdate()->findOrFail($order->id);
+
+            if (! $order->status->canTransitionTo($status)) {
+                throw new BusinessException('Không thể chuyển đơn '.$order->code.' từ "'.$order->status->label().'" sang "'.$status->label().'".');
+            }
+
+            $order->update(['status' => $status]);
+
+            return $order;
+        });
+    }
 }

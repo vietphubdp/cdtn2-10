@@ -121,4 +121,101 @@ class OrderServiceTest extends TestCase
         $this->assertSame(Order::makeCode($first->id), $first->code);
         $this->assertSame(Order::makeCode($first->id + 1), $second->code);
     }
+
+    public function test_cancel_pending_order_restores_stock(): void
+    {
+        $a = Product::factory()->create(['stock' => 10]);
+        $b = Product::factory()->create(['stock' => 5]);
+        $order = $this->orders->placeOrder(User::factory()->create(), $this->shipping(), [$a->id => 3, $b->id => 2]);
+
+        $cancelled = $this->orders->cancel($order);
+
+        $this->assertSame(OrderStatus::Cancelled, $cancelled->status);
+        $this->assertSame(OrderStatus::Cancelled, $order->fresh()->status);
+        $this->assertSame(10, $a->fresh()->stock);
+        $this->assertSame(5, $b->fresh()->stock);
+    }
+
+    public function test_admin_can_cancel_confirmed_order(): void
+    {
+        $product = Product::factory()->create(['stock' => 4]);
+        $order = $this->orders->placeOrder(User::factory()->create(), $this->shipping(), [$product->id => 1]);
+        $order->update(['status' => OrderStatus::Confirmed]);
+
+        $this->orders->cancel($order);
+
+        $this->assertSame(OrderStatus::Cancelled, $order->fresh()->status);
+        $this->assertSame(4, $product->fresh()->stock);
+    }
+
+    public function test_cannot_cancel_shipping_completed_or_cancelled_order(): void
+    {
+        $product = Product::factory()->create(['stock' => 10]);
+        $order = $this->orders->placeOrder(User::factory()->create(), $this->shipping(), [$product->id => 2]);
+
+        foreach ([OrderStatus::Shipping, OrderStatus::Completed, OrderStatus::Cancelled] as $status) {
+            $order->update(['status' => $status]);
+
+            try {
+                $this->orders->cancel($order);
+                $this->fail('Không được hủy đơn '.$status->value);
+            } catch (BusinessException) {
+                $this->assertSame($status, $order->fresh()->status);
+            }
+        }
+
+        // Không hoàn kho lần nào
+        $this->assertSame(8, $product->fresh()->stock);
+    }
+
+    public function test_cancel_uses_latest_status_from_database(): void
+    {
+        $product = Product::factory()->create(['stock' => 10]);
+        $order = $this->orders->placeOrder(User::factory()->create(), $this->shipping(), [$product->id => 2]);
+        $stale = Order::find($order->id);
+
+        $this->orders->cancel($order);
+
+        // Bản $stale vẫn ghi pending nhưng đơn đã hủy → không được hoàn kho thêm lần nữa
+        $this->expectException(BusinessException::class);
+        try {
+            $this->orders->cancel($stale);
+        } finally {
+            $this->assertSame(10, $product->fresh()->stock);
+        }
+    }
+
+    public function test_change_status_follows_br05(): void
+    {
+        $product = Product::factory()->create(['stock' => 10]);
+        $order = $this->orders->placeOrder(User::factory()->create(), $this->shipping(), [$product->id => 1]);
+
+        $this->orders->changeStatus($order, OrderStatus::Confirmed);
+        $this->orders->changeStatus($order, OrderStatus::Shipping);
+        $updated = $this->orders->changeStatus($order, OrderStatus::Completed);
+
+        $this->assertSame(OrderStatus::Completed, $updated->status);
+        $this->assertSame(9, $product->fresh()->stock);
+    }
+
+    public function test_change_status_blocks_skipping_steps(): void
+    {
+        $order = $this->orders->placeOrder(User::factory()->create(), $this->shipping(), [Product::factory()->create()->id => 1]);
+
+        $this->expectException(BusinessException::class);
+        $this->expectExceptionMessage('từ "Chờ xác nhận" sang "Đang giao"');
+        $this->orders->changeStatus($order, OrderStatus::Shipping);
+    }
+
+    public function test_change_status_to_cancelled_restores_stock(): void
+    {
+        $product = Product::factory()->create(['stock' => 6]);
+        $order = $this->orders->placeOrder(User::factory()->create(), $this->shipping(), [$product->id => 2]);
+        $this->orders->changeStatus($order, OrderStatus::Confirmed);
+
+        $this->orders->changeStatus($order, OrderStatus::Cancelled);
+
+        $this->assertSame(OrderStatus::Cancelled, $order->fresh()->status);
+        $this->assertSame(6, $product->fresh()->stock);
+    }
 }
