@@ -102,4 +102,73 @@ class CartTest extends TestCase
             ->assertSessionHas('success', 'Đã xóa sản phẩm khỏi giỏ hàng.')
             ->assertSessionHas('cart', [$kept->id => 2]);
     }
+
+    public function test_guest_can_add_product_from_card_and_header_shows_count(): void
+    {
+        $product = Product::factory()->create(['name' => 'Chuột không dây M1', 'stock' => 10]);
+
+        $this->from(route('products.index'))
+            ->post(route('cart.add'), ['product_id' => $product->id, 'quantity' => 1])
+            ->assertRedirect(route('products.index'))
+            ->assertSessionHas('success', 'Đã thêm "Chuột không dây M1" vào giỏ hàng.')
+            ->assertSessionHas('cart', [$product->id => 1]);
+
+        $this->get(route('home'))
+            ->assertSee('Giỏ hàng <span class="badge text-bg-light">1</span>', false);
+    }
+
+    public function test_adding_same_product_again_adds_up_quantity(): void
+    {
+        $product = Product::factory()->create(['stock' => 10]);
+
+        $this->withSession(['cart' => [$product->id => 2]])
+            ->from(route('products.show', $product->slug))
+            ->post(route('cart.add'), ['product_id' => $product->id, 'quantity' => 3])
+            ->assertRedirect(route('products.show', $product->slug))
+            ->assertSessionHas('cart', [$product->id => 5]);
+    }
+
+    public function test_add_without_quantity_adds_one(): void
+    {
+        $product = Product::factory()->create(['stock' => 10]);
+
+        $this->post(route('cart.add'), ['product_id' => $product->id])
+            ->assertSessionHas('cart', [$product->id => 1]);
+    }
+
+    public function test_add_over_stock_is_rejected(): void
+    {
+        $product = Product::factory()->create(['name' => 'Sạc dự phòng 10000mAh', 'stock' => 3]);
+
+        $this->withSession(['cart' => [$product->id => 2]])
+            ->post(route('cart.add'), ['product_id' => $product->id, 'quantity' => 2])
+            ->assertSessionHas('error', 'Sản phẩm "Sạc dự phòng 10000mAh" chỉ còn 3 trong kho.')
+            ->assertSessionHas('cart', [$product->id => 2]);
+    }
+
+    public function test_out_of_stock_and_hidden_products_cannot_be_added(): void
+    {
+        $soldOut = Product::factory()->outOfStock()->create();
+        $hidden = Product::factory()->hidden()->create();
+
+        $this->post(route('cart.add'), ['product_id' => $soldOut->id])
+            ->assertSessionHas('error')
+            ->assertSessionMissing('cart');
+
+        $this->post(route('cart.add'), ['product_id' => $hidden->id])
+            ->assertSessionHas('error', 'Sản phẩm không còn được bán.')
+            ->assertSessionMissing('cart');
+    }
+
+    public function test_add_with_invalid_data_fails_validation(): void
+    {
+        $product = Product::factory()->create(['stock' => 10]);
+
+        $this->post(route('cart.add'), ['product_id' => 9999])
+            ->assertSessionHasErrors('product_id');
+
+        $this->post(route('cart.add'), ['product_id' => $product->id, 'quantity' => 0])
+            ->assertSessionHasErrors('quantity')
+            ->assertSessionMissing('cart');
+    }
 }
