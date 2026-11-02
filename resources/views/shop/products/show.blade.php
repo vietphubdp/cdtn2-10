@@ -62,8 +62,11 @@
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                     <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
                         <label for="quantity" class="form-label mb-0">Số lượng:</label>
-                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ $product->stock }}"
-                               class="form-control" style="width: 6rem">
+                        <input type="number" id="quantity" name="quantity" value="{{ old('quantity', 1) }}" min="1" max="{{ $product->stock }}"
+                               class="form-control @error('quantity') is-invalid @enderror" style="width: 6rem">
+                        @error('quantity')
+                            <div class="invalid-feedback d-block w-100">{{ $message }}</div>
+                        @enderror
                     </div>
                     <button type="submit" class="btn btn-dark px-4">Thêm vào giỏ hàng</button>
                 </form>

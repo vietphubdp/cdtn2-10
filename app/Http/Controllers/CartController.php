@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\BusinessException;
+use App\Http\Requests\AddToCartRequest;
 use App\Http\Requests\UpdateCartRequest;
+use App\Models\Product;
 use App\Services\CartService;
-use Illuminate\Http\Request;
 
 /**
  * Giỏ hàng lưu trong session, mọi xử lý đi qua CartService (FR-06).
@@ -28,9 +29,18 @@ class CartController extends Controller
         ]);
     }
 
-    public function add(Request $request)
+    public function add(AddToCartRequest $request, CartService $cart)
     {
-        abort(501); // TODO [T-25]
+        $product = Product::findOrFail($request->integer('product_id'));
+
+        try {
+            $cart->add($product, $request->integer('quantity', 1));
+        } catch (BusinessException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        // Số trên icon giỏ ở header tự cập nhật vì đọc từ session
+        return back()->with('success', "Đã thêm \"{$product->name}\" vào giỏ hàng.");
     }
 
     public function update(UpdateCartRequest $request, int $productId, CartService $cart)
