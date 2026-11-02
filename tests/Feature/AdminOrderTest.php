@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Enums\OrderStatus;
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -137,5 +139,143 @@ class AdminOrderTest extends TestCase
     {
         $this->get(route('admin.orders.index'))
             ->assertRedirect(route('login'));
+    }
+
+    /**
+     * Đơn 1 sản phẩm: kho còn $stock sau khi đã bán $quantity.
+     */
+    private function orderWithProduct(OrderStatus $status, int $stock = 5, int $quantity = 2): Order
+    {
+        $order = Order::factory()->status($status)->create();
+        OrderItem::factory()->for($order)->create([
+            'product_id' => Product::factory()->create(['stock' => $stock])->id,
+            'quantity' => $quantity,
+        ]);
+
+        return $order;
+    }
+
+    public function test_admin_sees_order_detail_with_items_and_next_statuses(): void
+    {
+        $order = Order::factory()->create([
+            'receiver_name' => 'Nguyễn Văn An',
+            'receiver_phone' => '0912345678',
+            'shipping_address' => '12 Đường A, TP.HCM',
+            'note' => 'giao giờ hành chính',
+            'subtotal' => 790000,
+            'total' => 790000,
+        ]);
+        OrderItem::factory()->for($order)->create([
+            'product_name' => 'Tai nghe Bluetooth X1',
+            'price' => 350000,
+            'quantity' => 2,
+            'line_total' => 700000,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('admin.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Đơn hàng TS-0001')
+            ->assertSee('Nguyễn Văn An · 0912345678')
+            ->assertSee('Ghi chú: giao giờ hành chính')
+            ->assertSee('Tai nghe Bluetooth X1')
+            ->assertSee('700.000đ')
+            ->assertSee('790.000đ')
+            // BR-05: đơn chờ xác nhận chỉ chọn được "Đã xác nhận" hoặc "Đã hủy"
+            ->assertSee('<option value="confirmed"', false)
+            ->assertSee('<option value="cancelled"', false)
+            ->assertDontSee('<option value="shipping"', false)
+            ->assertDontSee('<option value="completed"', false);
+    }
+
+    public function test_final_status_order_has_no_update_form(): void
+    {
+        $order = Order::factory()->status(OrderStatus::Completed)->create();
+
+        $this->actingAs($this->admin())
+            ->get(route('admin.orders.show', $order))
+            ->assertOk()
+            ->assertSee('không thể đổi nữa')
+            ->assertDontSee('name="status"', false);
+    }
+
+    public function test_admin_moves_order_through_valid_statuses(): void
+    {
+        $order = Order::factory()->create();
+        $admin = $this->admin();
+
+        foreach ([OrderStatus::Confirmed, OrderStatus::Shipping, OrderStatus::Completed] as $status) {
+            $this->actingAs($admin)
+                ->patch(route('admin.orders.status', $order), ['status' => $status->value])
+                ->assertRedirect(route('admin.orders.show', $order))
+                ->assertSessionHas('success', 'Đã chuyển đơn TS-0001 sang "'.$status->label().'".');
+
+            $this->assertSame($status, $order->fresh()->status);
+        }
+    }
+
+    public function test_invalid_transition_is_blocked(): void
+    {
+        $order = Order::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->from(route('admin.orders.show', $order))
+            ->patch(route('admin.orders.status', $order), ['status' => 'completed'])
+            ->assertRedirect(route('admin.orders.show', $order))
+            ->assertSessionHas('error', 'Không thể chuyển đơn TS-0001 từ "Chờ xác nhận" sang "Hoàn thành".');
+
+        $this->assertSame(OrderStatus::Pending, $order->fresh()->status);
+    }
+
+    public function test_cancelling_order_restores_stock(): void
+    {
+        $order = $this->orderWithProduct(OrderStatus::Confirmed, stock: 5, quantity: 2);
+
+        $this->actingAs($this->admin())
+            ->patch(route('admin.orders.status', $order), ['status' => 'cancelled'])
+            ->assertRedirect(route('admin.orders.show', $order))
+            ->assertSessionHas('success', 'Đã chuyển đơn TS-0001 sang "Đã hủy". Tồn kho đã được cộng lại.');
+
+        $this->assertSame(OrderStatus::Cancelled, $order->fresh()->status);
+        $this->assertSame(7, $order->items->first()->product->fresh()->stock);
+    }
+
+    public function test_shipping_order_cannot_be_cancelled_and_stock_unchanged(): void
+    {
+        $order = $this->orderWithProduct(OrderStatus::Shipping, stock: 5, quantity: 2);
+
+        $this->actingAs($this->admin())
+            ->patch(route('admin.orders.status', $order), ['status' => 'cancelled'])
+            ->assertSessionHas('error');
+
+        $this->assertSame(OrderStatus::Shipping, $order->fresh()->status);
+        $this->assertSame(5, $order->items->first()->product->fresh()->stock);
+    }
+
+    public function test_unknown_status_value_is_rejected(): void
+    {
+        $order = Order::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->patch(route('admin.orders.status', $order), ['status' => 'abc'])
+            ->assertSessionHasErrors(['status' => 'Trạng thái không hợp lệ.']);
+
+        $this->assertSame(OrderStatus::Pending, $order->fresh()->status);
+    }
+
+    public function test_customer_cannot_view_or_update_admin_order(): void
+    {
+        $order = Order::factory()->create();
+        $customer = User::factory()->create();
+
+        $this->actingAs($customer)
+            ->get(route('admin.orders.show', $order))
+            ->assertForbidden();
+
+        $this->actingAs($customer)
+            ->patch(route('admin.orders.status', $order), ['status' => 'confirmed'])
+            ->assertForbidden();
+
+        $this->assertSame(OrderStatus::Pending, $order->fresh()->status);
     }
 }
