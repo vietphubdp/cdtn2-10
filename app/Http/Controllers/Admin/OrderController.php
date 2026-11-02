@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\OrderStatus;
+use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateOrderStatusRequest;
 use App\Models\Order;
+use App\Services\OrderService;
 use Illuminate\Http\Request;
 
 /**
@@ -45,14 +48,35 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders', 'counts', 'status', 'code', 'from', 'to'));
     }
 
+    /**
+     * Chi tiết đơn + ô chọn trạng thái kế tiếp hợp lệ (Hình 16).
+     */
     public function show(Order $order)
     {
-        abort(501); // TODO [T-36]
+        $order->load(['items', 'coupon']);
+
+        return view('admin.orders.show', compact('order'));
     }
 
-    public function updateStatus(Request $request, Order $order)
+    /**
+     * Đổi trạng thái đơn theo BR-05; chọn "Đã hủy" thì OrderService tự hoàn kho (BR-06).
+     */
+    public function updateStatus(UpdateOrderStatusRequest $request, Order $order, OrderService $orders)
     {
-        abort(501); // TODO [T-36]
+        $status = OrderStatus::from($request->validated('status'));
+
+        try {
+            $orders->changeStatus($order, $status);
+        } catch (BusinessException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        $message = 'Đã chuyển đơn '.$order->code.' sang "'.$status->label().'".';
+        if ($status === OrderStatus::Cancelled) {
+            $message .= ' Tồn kho đã được cộng lại.';
+        }
+
+        return redirect()->route('admin.orders.show', $order)->with('success', $message);
     }
 
     /**
