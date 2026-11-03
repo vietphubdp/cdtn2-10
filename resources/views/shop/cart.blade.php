@@ -18,9 +18,9 @@
                         <table class="table align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Ảnh</th>
+                                    <th class="d-none d-sm-table-cell">Ảnh</th>
                                     <th>Sản phẩm</th>
-                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-end d-none d-sm-table-cell">Đơn giá</th>
                                     <th class="text-center">Số lượng</th>
                                     <th class="text-end">Thành tiền</th>
                                     <th></th>
@@ -30,7 +30,7 @@
                                 @foreach ($items as $item)
                                     @php($product = $item['product'])
                                     <tr>
-                                        <td>
+                                        <td class="d-none d-sm-table-cell">
                                             @if ($product->image_url)
                                                 <img src="{{ $product->image_url }}" alt="{{ $product->name }}" width="56" height="56" class="rounded border object-fit-cover">
                                             @else
@@ -39,8 +39,10 @@
                                         </td>
                                         <td>
                                             <a href="{{ route('products.show', $product->slug) }}" class="text-dark">{{ $product->name }}</a>
+                                            {{-- Màn hình nhỏ ẩn cột ảnh, đơn giá → hiện đơn giá dưới tên --}}
+                                            <div class="small text-secondary text-nowrap d-sm-none">@money($product->final_price)</div>
                                         </td>
-                                        <td class="text-end text-nowrap">@money($product->final_price)</td>
+                                        <td class="text-end text-nowrap d-none d-sm-table-cell">@money($product->final_price)</td>
                                         <td>
                                             {{-- Nút −/+ gửi số lượng mới; tối đa bằng tồn kho (BR-03) --}}
                                             <form method="POST" action="{{ route('cart.update', $product->id) }}" class="d-flex align-items-center justify-content-center gap-2">

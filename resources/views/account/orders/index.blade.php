@@ -32,7 +32,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Mã đơn</th>
-                                    <th>Ngày đặt</th>
+                                    <th class="d-none d-sm-table-cell">Ngày đặt</th>
                                     <th class="text-end">Tổng tiền</th>
                                     <th>Trạng thái</th>
                                     <th>Thao tác</th>
@@ -41,8 +41,8 @@
                             <tbody>
                                 @foreach ($orders as $order)
                                     <tr>
-                                        <td class="fw-semibold">{{ $order->code }}</td>
-                                        <td>{{ $order->created_at->format('d/m/Y') }}</td>
+                                        <td class="fw-semibold text-nowrap"><a href="{{ route('orders.show', $order->code) }}" class="text-dark">{{ $order->code }}</a></td>
+                                        <td class="d-none d-sm-table-cell">{{ $order->created_at->format('d/m/Y') }}</td>
                                         <td class="text-end text-nowrap">@money($order->total)</td>
                                         <td><span class="badge text-bg-{{ $order->status->color() }}">{{ $order->status->label() }}</span></td>
                                         <td class="text-nowrap">
