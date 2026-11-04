@@ -11,12 +11,12 @@
 @endphp
 
 <div class="offcanvas-header border-bottom border-secondary">
-    <h2 class="offcanvas-title h5 fw-bold mb-0" id="adminSidebarLabel">TECHSHOP ADMIN</h2>
+    <h2 class="offcanvas-title h5 fw-bold mb-0" id="adminSidebarLabel">ADMIN</h2>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#adminSidebar" aria-label="Đóng"></button>
 </div>
 
 <div class="offcanvas-body d-flex flex-column p-3 w-100">
-    <div class="d-none d-lg-block fs-5 fw-bold mb-1">TECHSHOP ADMIN</div>
+    <div class="d-none d-lg-block fs-5 fw-bold mb-1"> ADMIN</div>
     <div class="small text-white-50 mb-3">Xin chào, {{ auth()->user()->name }}</div>
 
     <ul class="nav flex-column">
@@ -30,7 +30,7 @@
                         {{ $label }}
                     </a>
                 @else
-                    <span class="nav-link px-0 disabled text-secondary">{{ $label }} (sắp có)</span>
+                    <span class="nav-link px-0 disabled text-secondary">{{ $label }}</span>
                 @endif
             </li>
         @endforeach
