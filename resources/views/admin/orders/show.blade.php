@@ -90,10 +90,12 @@
                         <td colspan="3" class="text-end">Tạm tính</td>
                         <td class="text-end text-nowrap">@money($order->subtotal)</td>
                     </tr>
-                    <tr>
-                        <td colspan="3" class="text-end">Giảm giá{{ $order->coupon ? ' ('.$order->coupon->code.')' : '' }}</td>
-                        <td class="text-end text-nowrap">−@money($order->discount)</td>
-                    </tr>
+                    @if ($order->discount > 0)
+                        <tr>
+                            <td colspan="3" class="text-end">Giảm giá{{ $order->coupon ? ' ('.$order->coupon->code.')' : '' }}</td>
+                            <td class="text-end text-nowrap">−@money($order->discount)</td>
+                        </tr>
+                    @endif
                     <tr>
                         <th colspan="3" class="text-end">Tổng cộng</th>
                         <th class="text-end text-nowrap">@money($order->total)</th>

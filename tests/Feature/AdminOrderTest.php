@@ -188,6 +188,24 @@ class AdminOrderTest extends TestCase
             ->assertDontSee('<option value="completed"', false);
     }
 
+    public function test_discount_row_only_shown_when_order_has_discount(): void
+    {
+        $admin = $this->admin();
+        $plain = Order::factory()->create(['subtotal' => 500000, 'discount' => 0, 'total' => 500000]);
+        $discounted = Order::factory()->create(['subtotal' => 500000, 'discount' => 50000, 'total' => 450000]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.orders.show', $plain))
+            ->assertOk()
+            ->assertDontSee('−0đ');
+
+        $this->actingAs($admin)
+            ->get(route('admin.orders.show', $discounted))
+            ->assertOk()
+            ->assertSee('−50.000đ')
+            ->assertSee('450.000đ');
+    }
+
     public function test_final_status_order_has_no_update_form(): void
     {
         $order = Order::factory()->status(OrderStatus::Completed)->create();
