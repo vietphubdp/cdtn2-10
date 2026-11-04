@@ -7,7 +7,7 @@
         <div class="col-md-8 col-lg-6 text-center">
             <div class="display-4">✓</div>
             <h1 class="h3 fw-bold">Đặt hàng thành công!</h1>
-            <p>Cảm ơn bạn đã mua hàng tại TechShop. Shop sẽ gọi xác nhận trong thời gian sớm nhất.</p>
+            <p>Cảm ơn bạn đã mua hàng tại website. Shop sẽ gọi xác nhận trong thời gian sớm nhất.</p>
 
             <div class="p-3 bg-white border rounded text-start mb-3">
                 <dl class="row mb-0">
