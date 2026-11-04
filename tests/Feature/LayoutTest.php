@@ -18,7 +18,7 @@ class LayoutTest extends TestCase
 
         $this->get(route('login'))
             ->assertOk()
-            ->assertSee('TECHSHOP')
+            ->assertSee('CDTN2-10')
             ->assertSee('Tìm sản phẩm theo tên...')
             ->assertSee('Đăng nhập / Đăng ký')
             ->assertSee('Giỏ hàng')
@@ -57,7 +57,7 @@ class LayoutTest extends TestCase
     {
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('TECHSHOP')
+            ->assertSee('CDTN2-10')
             ->assertSee('Hotline');
     }
 
