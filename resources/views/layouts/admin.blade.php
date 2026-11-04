@@ -3,13 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Quản trị') – TechShop Admin</title>
+    <title>@yield('title', 'Quản trị') – Admin</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-light">
     {{-- Thanh trên cùng chỉ hiện ở màn hình nhỏ: nút ☰ mở sidebar (NFR-03) --}}
     <nav class="navbar navbar-dark bg-dark d-lg-none px-3">
-        <span class="navbar-brand fw-bold mb-0">TECHSHOP ADMIN</span>
+        <span class="navbar-brand fw-bold mb-0">ADMIN</span>
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar"
                 aria-controls="adminSidebar" aria-label="Mở menu quản trị">
             <span class="navbar-toggler-icon"></span>

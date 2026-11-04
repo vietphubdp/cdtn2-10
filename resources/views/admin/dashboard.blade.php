@@ -27,7 +27,5 @@
         @endforeach
     </div>
 
-    <div class="alert alert-secondary mb-0">
-        Thống kê doanh thu theo ngày, số đơn theo trạng thái và top 5 sản phẩm bán chạy sẽ hiển thị tại đây.
-    </div>
+    
 @endsection

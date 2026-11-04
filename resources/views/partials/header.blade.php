@@ -3,7 +3,7 @@
         <div class="row g-2 align-items-center">
             <div class="col-auto">
                 <a href="{{ route('home') }}" class="d-inline-block border border-2 border-dark px-3 py-1 fs-5 fw-bold text-dark text-decoration-none">
-                    TECHSHOP
+                    CDTN2-10
                 </a>
             </div>
 
