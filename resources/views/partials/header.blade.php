@@ -1,8 +1,8 @@
-<header class="bg-white border-bottom border-2">
+<header class="site-header bg-white border-bottom border-2">
     <div class="container py-3">
         <div class="row g-2 align-items-center">
             <div class="col-auto">
-                <a href="{{ route('home') }}" class="d-inline-block border border-2 border-dark px-3 py-1 fs-5 fw-bold text-dark text-decoration-none">
+                <a href="{{ route('home') }}" class="site-logo d-inline-block border border-2 border-dark px-3 py-1 fs-5 fw-bold text-dark text-decoration-none">
                     CDTN2-10
                 </a>
             </div>

@@ -6,7 +6,7 @@
     <div class="row g-3 mb-4">
         {{-- Banner khuyến mãi (ảnh tĩnh) --}}
         <div class="col-lg-8">
-            <div class="h-100 p-4 p-md-5 bg-dark text-white rounded d-flex flex-column justify-content-center">
+            <div class="hero-banner h-100 p-4 p-md-5 bg-dark text-white rounded d-flex flex-column justify-content-center">
                 <h1 class="h3">Phụ kiện công nghệ chính hãng</h1>
                 <p class="mb-3 text-white-50">Tai nghe, sạc dự phòng, chuột, bàn phím… giá tốt mỗi ngày.</p>
                 <div>

@@ -2,7 +2,7 @@
     Thẻ sản phẩm dùng chung (trang chủ, danh sách SP).
     Cách dùng: @include('partials.product-card', ['product' => $product])
 --}}
-<div class="card h-100">
+<div class="product-card card h-100">
     <a href="{{ route('products.show', $product->slug) }}" class="ratio ratio-1x1 bg-body-secondary">
         @if ($product->image_url)
             <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="card-img-top object-fit-cover">

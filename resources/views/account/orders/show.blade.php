@@ -38,7 +38,7 @@
             @if ($currentStep === false)
                 <div class="alert alert-secondary">Đơn hàng đã bị hủy.</div>
             @else
-                <div class="row g-0 text-center small border rounded overflow-hidden mb-3">
+                <div class="step-bar row g-0 text-center small border rounded overflow-hidden mb-3">
                     @foreach ($steps as $index => $step)
                         <div @class(['col-6 col-md-3 py-2', 'bg-dark text-white' => $index <= $currentStep, 'bg-light text-secondary' => $index > $currentStep])>
                             {{ $index <= $currentStep ? '●' : '○' }} {{ $step->label() }}
