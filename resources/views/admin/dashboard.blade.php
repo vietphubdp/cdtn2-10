@@ -17,7 +17,7 @@
     <div class="row g-3 mb-4">
         @foreach ($cards as [$label, $count, $url])
             <div class="col-6 col-xl-3">
-                <a href="{{ $url }}" class="card h-100 text-center text-decoration-none shadow-sm">
+                <a href="{{ $url }}" class="stat-card card h-100 text-center text-decoration-none shadow-sm">
                     <div class="card-body">
                         <div class="text-secondary">{{ $label }}</div>
                         <div class="fs-2 fw-bold text-dark">{{ $count }}</div>

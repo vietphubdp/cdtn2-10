@@ -11,7 +11,7 @@
                 <h1 class="h3 fw-bold mb-3">Thông tin giao hàng</h1>
 
                 {{-- Các bước đặt hàng --}}
-                <div class="row g-0 text-center small border rounded overflow-hidden mb-3">
+                <div class="step-bar row g-0 text-center small border rounded overflow-hidden mb-3">
                     <div class="col-4 py-2 bg-light">
                         <a href="{{ route('cart.index') }}" class="text-dark">1. Giỏ hàng</a>
                     </div>

@@ -5,7 +5,7 @@
 @section('content')
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6 text-center">
-            <div class="display-4">✓</div>
+            <div class="success-icon display-4">✓</div>
             <h1 class="h3 fw-bold">Đặt hàng thành công!</h1>
             <p>Cảm ơn bạn đã mua hàng tại website. Shop sẽ gọi xác nhận trong thời gian sớm nhất.</p>
 
