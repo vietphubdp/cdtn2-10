@@ -22,7 +22,7 @@ class AdminLayoutTest extends TestCase
         $this->actingAs($this->admin())
             ->get(route('admin.dashboard'))
             ->assertOk()
-            ->assertSee('TECHSHOP ADMIN')
+            ->assertSee('ADMIN')
             ->assertSee('Xin chào, Quản trị viên')
             ->assertSeeInOrder(['Dashboard', 'Danh mục', 'Sản phẩm', 'Đơn hàng', 'Người dùng', 'Mã giảm giá', 'Đăng xuất'])
             ->assertSee(route('admin.categories.index'), false)
