@@ -1,4 +1,4 @@
-# TechShop – Website bán phụ kiện công nghệ
+# Website bán phụ kiện công nghệ
 
 Đồ án môn Chuyên đề tốt nghiệp 2 – Trường Đại học Văn Lang.
 GVHD: ThS. Nguyễn Văn Trung.
