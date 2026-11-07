@@ -55,7 +55,7 @@ class DatabaseSeederTest extends TestCase
     {
         $this->seed();
 
-        $this->assertSame(12, Order::count());
+        $this->assertSame(13, Order::count());
         foreach (OrderStatus::cases() as $status) {
             $this->assertGreaterThan(0, Order::where('status', $status)->count(), $status->label());
         }

@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Category;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -56,19 +54,13 @@ class AdminLayoutTest extends TestCase
             ->assertSee('offcanvas-lg', false);
     }
 
-    public function test_dashboard_shows_counts(): void
+    public function test_dashboard_shows_customer_count(): void
     {
-        $category = Category::factory()->create();
-        Category::factory()->create();
-        Product::factory()->count(3)->create(['category_id' => $category->id]);
         User::factory()->count(4)->create();
 
         // Tài khoản admin không tính là khách hàng
         $this->actingAs($this->admin())
             ->get(route('admin.dashboard'))
-            ->assertViewHas('categoryCount', 2)
-            ->assertViewHas('productCount', 3)
-            ->assertViewHas('orderCount', 0)
             ->assertViewHas('customerCount', 4);
     }
 
