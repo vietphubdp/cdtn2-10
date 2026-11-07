@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\PasswordRequest;
+use App\Http\Requests\ProfileRequest;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Hồ sơ cá nhân và đổi mật khẩu (FR-15).
@@ -11,16 +13,22 @@ class ProfileController extends Controller
 {
     public function edit()
     {
-        abort(501); // TODO Sprint 3 (FR-15)
+        return view('account.profile', ['user' => auth()->user()]);
     }
 
-    public function update(Request $request)
+    public function update(ProfileRequest $request)
     {
-        abort(501); // TODO Sprint 3 (FR-15)
+        $request->user()->update($request->validated());
+
+        return redirect()->route('profile.edit')->with('success', 'Đã cập nhật hồ sơ.');
     }
 
-    public function password(Request $request)
+    public function password(PasswordRequest $request)
     {
-        abort(501); // TODO Sprint 3 (FR-15)
+        $request->user()->update([
+            'password' => Hash::make($request->validated('password')),
+        ]);
+
+        return redirect()->to(route('profile.edit').'#doi-mat-khau')->with('success', 'Đã đổi mật khẩu.');
     }
 }
