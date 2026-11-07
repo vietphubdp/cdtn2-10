@@ -49,8 +49,8 @@
                 <thead class="table-light">
                     <tr>
                         <th>Mã đơn</th>
-                        <th>Khách hàng</th>
-                        <th>Ngày đặt</th>
+                        <th class="d-none d-md-table-cell">Khách hàng</th>
+                        <th class="d-none d-sm-table-cell">Ngày đặt</th>
                         <th class="text-end">Tổng tiền</th>
                         <th>Trạng thái</th>
                         <th class="text-end">Thao tác</th>
@@ -59,9 +59,14 @@
                 <tbody>
                     @forelse ($orders as $order)
                         <tr>
-                            <td class="fw-semibold">{{ $order->code }}</td>
-                            <td>{{ $order->receiver_name }} · {{ $order->receiver_phone }}</td>
-                            <td class="text-nowrap">{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                            <td>
+                                <a href="{{ route('admin.orders.show', $order) }}" class="fw-semibold text-dark text-nowrap">{{ $order->code }}</a>
+                                {{-- Màn nhỏ ẩn cột Khách hàng/Ngày đặt nên hiện dưới mã đơn --}}
+                                <div class="small text-secondary d-md-none">{{ $order->receiver_name }}</div>
+                                <div class="small text-secondary d-sm-none text-nowrap">{{ $order->created_at->format('d/m/Y') }}</div>
+                            </td>
+                            <td class="d-none d-md-table-cell">{{ $order->receiver_name }} · {{ $order->receiver_phone }}</td>
+                            <td class="d-none d-sm-table-cell text-nowrap">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                             <td class="text-end text-nowrap">@money($order->total)</td>
                             <td><span class="badge text-bg-{{ $order->status->color() }}">{{ $order->status->label() }}</span></td>
                             <td class="text-end">
