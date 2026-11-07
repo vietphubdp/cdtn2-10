@@ -11,7 +11,8 @@ use Illuminate\Database\Seeder;
 class OrderSeeder extends Seeder
 {
     /**
-     * 12 đơn mẫu của 2 khách, đủ 5 trạng thái, rải trong khoảng 20 ngày gần đây.
+     * 13 đơn mẫu của 2 khách, đủ 5 trạng thái, rải trong khoảng 20 ngày gần đây.
+     * Đơn cuối hoàn thành ngay hôm nay để dashboard có doanh thu hôm nay/tháng này khác 0.
      * Đơn được tạo qua OrderService giống khách đặt thật: lưu giá lúc mua, trừ kho,
      * đơn bị hủy được cộng lại kho (BR-04, BR-06).
      * Mỗi dòng: [email khách, [tên SP => số lượng], trạng thái cuối, đặt cách đây mấy ngày]
@@ -31,6 +32,7 @@ class OrderSeeder extends Seeder
             ['khach@techshop.test', ['Tai nghe Apple AirPods 4' => 1], OrderStatus::Confirmed, 2],
             ['khach2@techshop.test', ['Chuột Logitech G102 Lightsync' => 1, 'Bàn phím cơ DareU EK87' => 1], OrderStatus::Pending, 1],
             ['khach@techshop.test', ['Loa bluetooth Sony SRS-XB100' => 2], OrderStatus::Pending, 0],
+            ['khach2@techshop.test', ['Củ sạc Anker 511 Nano 3 30W' => 1, 'Cáp Anker PowerLine III USB-C to USB-C 1.8m' => 1], OrderStatus::Completed, 0],
         ];
 
         foreach ($orders as [$email, $items, $status, $daysAgo]) {
