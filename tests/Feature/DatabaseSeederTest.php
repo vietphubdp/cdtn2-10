@@ -16,7 +16,7 @@ class DatabaseSeederTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_seeder_creates_admin_and_two_customers(): void
+    public function test_seeder_creates_admin_and_three_customers_with_one_locked(): void
     {
         $this->seed();
 
@@ -24,8 +24,10 @@ class DatabaseSeederTest extends TestCase
         $this->assertTrue($admin->isAdmin());
         $this->assertTrue(Hash::check('password', $admin->password));
 
-        $this->assertSame(2, User::where('role', User::ROLE_CUSTOMER)->count());
-        $this->assertDatabaseHas('users', ['email' => 'khach@techshop.test', 'role' => User::ROLE_CUSTOMER]);
+        $this->assertSame(3, User::where('role', User::ROLE_CUSTOMER)->count());
+        $this->assertDatabaseHas('users', ['email' => 'khach@techshop.test', 'role' => User::ROLE_CUSTOMER, 'is_locked' => false]);
+        $this->assertDatabaseHas('users', ['email' => 'locked@techshop.test', 'role' => User::ROLE_CUSTOMER, 'is_locked' => true]);
+        $this->assertSame(1, User::where('is_locked', true)->count());
     }
 
     public function test_seeder_creates_categories_and_products_for_demo(): void
