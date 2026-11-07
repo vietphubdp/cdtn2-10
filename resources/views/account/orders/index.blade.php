@@ -34,22 +34,27 @@
                                     <th>Mã đơn</th>
                                     <th class="d-none d-sm-table-cell">Ngày đặt</th>
                                     <th class="text-end">Tổng tiền</th>
-                                    <th>Trạng thái</th>
+                                    <th class="d-none d-sm-table-cell">Trạng thái</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($orders as $order)
                                     <tr>
-                                        <td class="fw-semibold text-nowrap"><a href="{{ route('orders.show', $order->code) }}" class="text-dark">{{ $order->code }}</a></td>
+                                        <td class="text-nowrap">
+                                            <a href="{{ route('orders.show', $order->code) }}" class="fw-semibold text-dark">{{ $order->code }}</a>
+                                            {{-- Màn hình nhỏ (< 576px) ẩn cột Trạng thái → hiện trạng thái ngay dưới mã đơn --}}
+                                            <div class="d-sm-none"><span class="badge text-bg-{{ $order->status->color() }}">{{ $order->status->label() }}</span></div>
+                                        </td>
                                         <td class="d-none d-sm-table-cell">{{ $order->created_at->format('d/m/Y') }}</td>
                                         <td class="text-end text-nowrap">@money($order->total)</td>
-                                        <td><span class="badge text-bg-{{ $order->status->color() }}">{{ $order->status->label() }}</span></td>
+                                        <td class="d-none d-sm-table-cell"><span class="badge text-bg-{{ $order->status->color() }}">{{ $order->status->label() }}</span></td>
                                         <td class="text-nowrap">
                                             <a href="{{ route('orders.show', $order->code) }}">Xem</a>
                                             @if ($order->status->canBeCancelledByCustomer())
-                                                ·
-                                                <form method="POST" action="{{ route('orders.cancel', $order->code) }}" class="d-inline"
+                                                <span class="d-none d-sm-inline">·</span>
+                                                {{-- Màn hình nhỏ: "Hủy đơn" xuống dòng dưới "Xem" để không bị khuất --}}
+                                                <form method="POST" action="{{ route('orders.cancel', $order->code) }}" class="d-block d-sm-inline"
                                                       onsubmit="return confirm(@js('Hủy đơn '.$order->code.'?'))">
                                                     @csrf
                                                     @method('PATCH')
