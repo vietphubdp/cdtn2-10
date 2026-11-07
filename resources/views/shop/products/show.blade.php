@@ -94,10 +94,56 @@
         </div>
     </div>
 
-    <section class="reviews">
+    <section class="reviews" id="danh-gia">
         <div class="reviews-head d-flex align-items-center gap-2 mb-4">
             <h2 class="h4 fw-bold mb-0">Đánh giá của khách hàng</h2>
             <span class="text-secondary">({{ $reviews->count() }})</span>
+        </div>
+
+        {{-- BR-07: chỉ khách có đơn "Hoàn thành" chứa SP mới được đánh giá, mỗi SP 1 lần --}}
+        <div class="review-form p-3 border rounded-4 mb-4">
+            @guest
+                <p class="mb-0">
+                    <a href="{{ route('login') }}">Đăng nhập để đánh giá</a> sản phẩm bạn đã mua.
+                </p>
+            @else
+                @if ($hasReviewed)
+                    <p class="mb-0 text-secondary">Bạn đã đánh giá sản phẩm này. Cảm ơn bạn!</p>
+                @elseif ($canReview)
+                    <form method="POST" action="{{ route('reviews.store', $product->slug) }}">
+                        @csrf
+                        <h3 class="h6 fw-bold mb-2">Viết đánh giá của bạn</h3>
+
+                        <div class="mb-3">
+                            <span class="form-label d-block">Số sao:</span>
+                            <div class="d-flex flex-wrap gap-2" role="radiogroup" aria-label="Số sao">
+                                @for ($star = 5; $star >= 1; $star--)
+                                    <input type="radio" class="btn-check" name="rating" id="rating-{{ $star }}" value="{{ $star }}"
+                                           @checked((int) old('rating', 5) === $star)>
+                                    <label class="btn btn-outline-dark btn-sm" for="rating-{{ $star }}">{{ $star }} ★</label>
+                                @endfor
+                            </div>
+                            @error('rating')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Nhận xét (không bắt buộc):</label>
+                            <textarea id="comment" name="comment" rows="3" maxlength="1000"
+                                      class="form-control @error('comment') is-invalid @enderror"
+                                      placeholder="Chia sẻ cảm nhận của bạn về sản phẩm">{{ old('comment') }}</textarea>
+                            @error('comment')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <button type="submit" class="btn btn-dark">Gửi đánh giá</button>
+                    </form>
+                @else
+                    <p class="mb-0 text-secondary">Chỉ khách đã mua và nhận hàng thành công mới đánh giá được sản phẩm này.</p>
+                @endif
+            @endguest
         </div>
 
         @if ($reviews->isEmpty())
