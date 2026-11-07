@@ -88,7 +88,13 @@
                             {{-- Tên và giá lấy từ order_items (lưu lúc mua), không lấy từ bảng products --}}
                             @foreach ($order->items as $item)
                                 <tr>
-                                    <td>{{ $item->product_name }}</td>
+                                    <td>
+                                        {{ $item->product_name }}
+                                        {{-- Đơn hoàn thành → link sang khung đánh giá của SP (BR-07); SP đã ẩn thì không có link --}}
+                                        @if ($order->status === \App\Enums\OrderStatus::Completed && $item->product?->is_active)
+                                            <a href="{{ route('products.show', $item->product->slug) }}#danh-gia" class="d-block small">Đánh giá</a>
+                                        @endif
+                                    </td>
                                     <td class="text-end text-nowrap">@money($item->price)</td>
                                     <td class="text-center">{{ $item->quantity }}</td>
                                     <td class="text-end text-nowrap">@money($item->line_total)</td>

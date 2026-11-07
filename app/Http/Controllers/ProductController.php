@@ -51,9 +51,14 @@ class ProductController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
-        // Đánh giá chỉ hiển thị; form viết đánh giá làm ở FR-12
+        // Đánh giá mới nhất lên trên
         $reviews = $product->reviews()->with('user')->latest('id')->get();
 
-        return view('shop.products.show', compact('product', 'reviews'));
+        // Form đánh giá chỉ hiện khi khách đủ điều kiện (BR-07)
+        $user = auth()->user();
+        $hasReviewed = $user !== null && $user->hasReviewed($product);
+        $canReview = $user !== null && ! $hasReviewed && $user->canReview($product);
+
+        return view('shop.products.show', compact('product', 'reviews', 'hasReviewed', 'canReview'));
     }
 }
