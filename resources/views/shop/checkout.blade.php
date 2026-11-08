@@ -79,17 +79,50 @@
                         </div>
                     @endforeach
                     <hr>
+
+                    {{-- Mã giảm giá (Hình 7): ô nhập thuộc form riêng #coupon-form ở cuối trang (form không lồng nhau được) --}}
+                    @if ($coupon)
+                        <div class="d-flex justify-content-between align-items-center gap-2 small mb-2">
+                            <span>Mã <strong>{{ $coupon->code }}</strong> · giảm {{ $coupon->describe() }}</span>
+                            <button type="submit" form="coupon-remove-form" class="btn btn-sm btn-link text-danger p-0">Bỏ mã</button>
+                        </div>
+                    @else
+                        <label for="code" class="form-label small mb-1">Mã giảm giá</label>
+                        <div class="input-group input-group-sm has-validation mb-2">
+                            <input type="text" id="code" name="code" value="{{ old('code') }}" form="coupon-form" maxlength="30"
+                                   class="form-control text-uppercase @error('code') is-invalid @enderror" placeholder="Nhập mã">
+                            <button type="submit" form="coupon-form" class="btn btn-outline-dark">Áp dụng</button>
+                            @error('code')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    @endif
+
                     <div class="d-flex justify-content-between">
                         <span>Tạm tính:</span>
                         <span>@money($subtotal)</span>
                     </div>
+                    @if ($discount > 0)
+                        <div class="d-flex justify-content-between text-success">
+                            <span>Giảm giá:</span>
+                            <span>−@money($discount)</span>
+                        </div>
+                    @endif
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Tổng cộng:</strong>
-                        <strong class="fs-5">@money($subtotal)</strong>
+                        <strong class="fs-5">@money($total)</strong>
                     </div>
                     <button type="submit" class="btn btn-dark w-100">Đặt hàng</button>
                 </div>
             </div>
         </div>
+    </form>
+
+    <form id="coupon-form" method="POST" action="{{ route('checkout.coupon.apply') }}" novalidate>
+        @csrf
+    </form>
+    <form id="coupon-remove-form" method="POST" action="{{ route('checkout.coupon.remove') }}">
+        @csrf
+        @method('DELETE')
     </form>
 @endsection

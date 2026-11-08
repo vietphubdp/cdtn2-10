@@ -20,7 +20,12 @@
                     </dd>
 
                     <dt class="col-sm-5 fw-normal">Tổng thanh toán</dt>
-                    <dd class="col-sm-7 text-sm-end fw-bold">@money($order->total)</dd>
+                    <dd class="col-sm-7 text-sm-end fw-bold">
+                        @money($order->total)
+                        @if ($order->discount > 0)
+                            <div class="small fw-normal text-success">Đã giảm @money($order->discount)</div>
+                        @endif
+                    </dd>
 
                     <dt class="col-sm-5 fw-normal">Phương thức</dt>
                     <dd class="col-sm-7 text-sm-end">Thanh toán khi nhận hàng (COD)</dd>
