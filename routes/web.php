@@ -72,6 +72,5 @@ Route::middleware(['auth', 'not_locked', 'role:admin'])->prefix('admin')->name('
     Route::get('/users', [Admin\UserController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/lock', [Admin\UserController::class, 'toggleLock'])->name('users.lock');
 
-    // Mã giảm giá (Could – FR-16), mở khi làm Sprint 3:
-    // Route::resource('coupons', Admin\CouponController::class)->except('show');
+    Route::resource('coupons', Admin\CouponController::class)->except('show');
 });
