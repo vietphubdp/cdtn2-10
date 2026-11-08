@@ -11,20 +11,23 @@ use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
+    public function __construct(private CouponService $coupons = new CouponService) {}
+
     /**
      * Đặt hàng COD (BR-04, BR-10). Cả đơn, các dòng đơn và trừ kho nằm trong 1 transaction:
      * thiếu hàng ở bất kỳ SP nào thì không có gì được ghi.
      *
      * @param  array{receiver_name: string, receiver_phone: string, shipping_address: string, note?: ?string}  $shipping
      * @param  array<int, int>  $quantities  [product_id => số lượng], lấy từ CartService::quantities()
+     * @param  ?string  $couponCode  mã giảm giá khách đã áp (BR-09), kiểm tra lại trong transaction
      */
-    public function placeOrder(User $user, array $shipping, array $quantities): Order
+    public function placeOrder(User $user, array $shipping, array $quantities, ?string $couponCode = null): Order
     {
         if ($quantities === []) {
             throw new BusinessException('Giỏ hàng đang trống.');
         }
 
-        return DB::transaction(function () use ($user, $shipping, $quantities) {
+        return DB::transaction(function () use ($user, $shipping, $quantities, $couponCode) {
             // Khóa các dòng SP tới hết transaction để 2 khách không cùng mua 1 món cuối
             $products = Product::whereIn('id', array_keys($quantities))
                 ->orderBy('id')
@@ -52,15 +55,20 @@ class OrderService
 
             $subtotal = array_sum(array_column($lines, 'line_total'));
 
+            // Mã có thể vừa hết lượt/hết hạn sau khi khách áp → kiểm tra lại, khóa dòng mã tới hết transaction
+            $coupon = $couponCode !== null ? $this->coupons->findUsable($couponCode, $subtotal, lock: true) : null;
+            $discount = $coupon ? $this->coupons->discountFor($coupon, $subtotal) : 0;
+
             $order = Order::create([
                 'user_id' => $user->id,
+                'coupon_id' => $coupon?->id,
                 'receiver_name' => $shipping['receiver_name'],
                 'receiver_phone' => $shipping['receiver_phone'],
                 'shipping_address' => $shipping['shipping_address'],
                 'note' => $shipping['note'] ?? null,
                 'subtotal' => $subtotal,
-                'discount' => 0,
-                'total' => $subtotal,
+                'discount' => $discount,
+                'total' => $subtotal - $discount,
                 'payment_method' => 'cod',
                 'status' => OrderStatus::Pending,
             ]);
@@ -80,6 +88,8 @@ class OrderService
 
                 $line['product']->decrement('stock', $line['quantity']);
             }
+
+            $coupon?->increment('used_count');
 
             return $order;
         });
