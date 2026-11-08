@@ -5,8 +5,8 @@ GVHD: ThS. Nguyễn Văn Trung.
 
 ## Chức năng chính
 
-- **Khách hàng:** đăng ký, đăng nhập; xem, tìm kiếm, lọc sản phẩm; giỏ hàng; đặt hàng (COD); theo dõi và hủy đơn; đánh giá sản phẩm.
-- **Quản trị:** quản lý danh mục, sản phẩm (kèm ảnh), đơn hàng, người dùng; thống kê doanh thu.
+- **Khách hàng:** đăng ký, đăng nhập; xem, tìm kiếm, lọc sản phẩm; giỏ hàng; đặt hàng (COD), áp mã giảm giá, nhận email xác nhận; theo dõi và hủy đơn; đánh giá sản phẩm.
+- **Quản trị:** quản lý danh mục, sản phẩm (kèm ảnh), đơn hàng, người dùng, mã giảm giá; thống kê doanh thu.
 
 ## Công nghệ
 
@@ -46,6 +46,22 @@ composer run dev
 Truy cập http://localhost:8000.
 
 Tài khoản quản trị mẫu: `admin@techshop.test` / `password`.
+
+## Email xác nhận đơn hàng
+
+Mặc định `.env` dùng `MAIL_MAILER=log`: mail không gửi ra ngoài mà được ghi vào `storage/logs/laravel.log`. Đặt một đơn hàng rồi mở file này, tìm mã đơn (ví dụ `TS-0014`) hoặc dòng `To: <email khách>` để xem nội dung mail (dòng `Subject` bị mã hóa vì có chữ tiếng Việt).
+
+Tùy chọn: muốn xem mail trong hộp thư thử nghiệm, tạo tài khoản Mailtrap rồi sửa `.env`:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=<username Mailtrap>
+MAIL_PASSWORD=<password Mailtrap>
+```
+
+Sau khi sửa `.env` chạy `php artisan config:clear`.
 
 ## Kiểm thử
 
