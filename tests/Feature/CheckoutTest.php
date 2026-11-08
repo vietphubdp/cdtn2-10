@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\OrderStatus;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -180,5 +181,117 @@ class CheckoutTest extends TestCase
             ->assertForbidden();
 
         $this->get(route('checkout.success', 'TS-9999'))->assertNotFound();
+    }
+
+    public function test_customer_applies_valid_coupon_on_checkout(): void
+    {
+        Coupon::factory()->create(['code' => 'GIAM10', 'value' => 10, 'max_discount' => 100000]);
+        $product = Product::factory()->create(['price' => 450000, 'stock' => 5]);
+
+        $this->actingAs(User::factory()->create())
+            ->withSession(['cart' => [$product->id => 2]])
+            ->post(route('checkout.coupon.apply'), ['code' => 'giam10'])
+            ->assertRedirect(route('checkout.index'))
+            ->assertSessionHas('coupon', 'GIAM10')
+            ->assertSessionHas('success', 'Đã áp dụng mã "GIAM10": giảm 90.000đ.');
+
+        $this->get(route('checkout.index'))
+            ->assertOk()
+            ->assertSeeInOrder(['GIAM10', 'Tạm tính:', '900.000đ', 'Giảm giá:', '90.000đ', 'Tổng cộng:', '810.000đ'])
+            ->assertSee('Bỏ mã');
+    }
+
+    public function test_invalid_coupons_show_error_under_input(): void
+    {
+        // TC-30: mã hết hạn; đơn 100.000 với mã tối thiểu 500.000
+        Coupon::factory()->expired()->create(['code' => 'HETHAN']);
+        Coupon::factory()->fixed(100000)->create(['code' => 'DON500K', 'min_order' => 500000]);
+        $product = Product::factory()->create(['price' => 100000, 'stock' => 5]);
+
+        $this->actingAs(User::factory()->create())
+            ->withSession(['cart' => [$product->id => 1]])
+            ->post(route('checkout.coupon.apply'), ['code' => 'HETHAN'])
+            ->assertRedirect(route('checkout.index'))
+            ->assertSessionHasErrors(['code' => 'Mã giảm giá "HETHAN" đã hết hạn.'])
+            ->assertSessionMissing('coupon');
+
+        $this->post(route('checkout.coupon.apply'), ['code' => 'DON500K'])
+            ->assertSessionHasErrors(['code' => 'Mã "DON500K" chỉ áp dụng cho đơn từ 500.000đ, đơn hiện tại 100.000đ.'])
+            ->assertSessionMissing('coupon');
+
+        $this->post(route('checkout.coupon.apply'), ['code' => ''])
+            ->assertSessionHasErrors('code');
+
+        // Không giảm: tổng vẫn bằng tạm tính
+        $this->get(route('checkout.index'))
+            ->assertSeeInOrder(['Tổng cộng:', '100.000đ'])
+            ->assertDontSee('Giảm giá:');
+    }
+
+    public function test_customer_removes_coupon(): void
+    {
+        Coupon::factory()->create(['code' => 'GIAM10']);
+        $product = Product::factory()->create(['stock' => 5]);
+
+        $this->actingAs(User::factory()->create())
+            ->withSession(['cart' => [$product->id => 1], 'coupon' => 'GIAM10'])
+            ->delete(route('checkout.coupon.remove'))
+            ->assertRedirect(route('checkout.index'))
+            ->assertSessionMissing('coupon');
+    }
+
+    public function test_coupon_is_dropped_when_cart_falls_below_min_order(): void
+    {
+        Coupon::factory()->fixed(50000)->create(['code' => 'GIAM50K', 'min_order' => 300000]);
+        $product = Product::factory()->create(['price' => 200000, 'stock' => 5]);
+
+        // Khách áp mã khi có 2 SP rồi bớt còn 1 trong giỏ
+        $this->actingAs(User::factory()->create())
+            ->withSession(['cart' => [$product->id => 1], 'coupon' => 'GIAM50K'])
+            ->get(route('checkout.index'))
+            ->assertOk()
+            ->assertSee('Mã đã được bỏ khỏi đơn hàng.')
+            ->assertSessionMissing('coupon')
+            ->assertSeeInOrder(['Tổng cộng:', '200.000đ']);
+    }
+
+    public function test_order_with_coupon_saves_discount(): void
+    {
+        $coupon = Coupon::factory()->fixed(50000)->create(['code' => 'GIAM50K', 'min_order' => 300000]);
+        $product = Product::factory()->create(['price' => 350000, 'stock' => 5]);
+
+        $this->actingAs(User::factory()->create())
+            ->withSession(['cart' => [$product->id => 1], 'coupon' => 'GIAM50K'])
+            ->post(route('checkout.store'), $this->shipping())
+            ->assertSessionMissing('coupon')
+            ->assertSessionMissing('cart');
+
+        $order = Order::sole();
+        $this->assertSame($coupon->id, $order->coupon_id);
+        $this->assertSame(350000, $order->subtotal);
+        $this->assertSame(50000, $order->discount);
+        $this->assertSame(300000, $order->total);
+        $this->assertSame(1, $coupon->fresh()->used_count);
+
+        $this->get(route('checkout.success', $order->code))
+            ->assertSee('300.000đ')
+            ->assertSee('Đã giảm 50.000đ');
+    }
+
+    public function test_coupon_expired_while_filling_form_returns_to_checkout(): void
+    {
+        Coupon::factory()->usedUp()->create(['code' => 'HETLUOT']);
+        $product = Product::factory()->create(['stock' => 5]);
+
+        $this->actingAs(User::factory()->create())
+            ->withSession(['cart' => [$product->id => 1], 'coupon' => 'HETLUOT'])
+            ->post(route('checkout.store'), $this->shipping())
+            ->assertRedirect(route('checkout.index'))
+            ->assertSessionHas('error', 'Mã giảm giá "HETLUOT" đã hết lượt sử dụng. Mã đã được bỏ, vui lòng kiểm tra lại tổng tiền rồi đặt hàng.')
+            ->assertSessionHasInput('receiver_name', 'Nguyễn Văn A')
+            ->assertSessionMissing('coupon');
+
+        $this->assertDatabaseCount('orders', 0);
+        $this->assertSame(5, $product->fresh()->stock);
     }
 }

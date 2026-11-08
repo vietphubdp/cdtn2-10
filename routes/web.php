@@ -39,9 +39,8 @@ Route::middleware(['auth', 'not_locked'])->group(function () {
 
     Route::get('/thanh-toan', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/thanh-toan', [CheckoutController::class, 'store'])->name('checkout.store');
-    // Mã giảm giá (Could – FR-16), mở khi làm Sprint 3:
-    // Route::post('/thanh-toan/ma-giam-gia', [CheckoutController::class, 'applyCoupon'])->name('checkout.coupon.apply');
-    // Route::delete('/thanh-toan/ma-giam-gia', [CheckoutController::class, 'removeCoupon'])->name('checkout.coupon.remove');
+    Route::post('/thanh-toan/ma-giam-gia', [CheckoutController::class, 'applyCoupon'])->name('checkout.coupon.apply');
+    Route::delete('/thanh-toan/ma-giam-gia', [CheckoutController::class, 'removeCoupon'])->name('checkout.coupon.remove');
     Route::get('/dat-hang-thanh-cong/{code}', [CheckoutController::class, 'success'])->name('checkout.success');
 
     Route::get('/tai-khoan/don-hang', [OrderController::class, 'index'])->name('orders.index');
@@ -72,6 +71,5 @@ Route::middleware(['auth', 'not_locked', 'role:admin'])->prefix('admin')->name('
     Route::get('/users', [Admin\UserController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/lock', [Admin\UserController::class, 'toggleLock'])->name('users.lock');
 
-    // Mã giảm giá (Could – FR-16), mở khi làm Sprint 3:
-    // Route::resource('coupons', Admin\CouponController::class)->except('show');
+    Route::resource('coupons', Admin\CouponController::class)->except('show');
 });
