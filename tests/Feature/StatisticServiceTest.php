@@ -51,6 +51,17 @@ class StatisticServiceTest extends TestCase
         $this->assertSame(500000, array_sum($this->statistics->revenueByDay(7)));
     }
 
+    public function test_today_follows_vietnam_time(): void
+    {
+        // 23:30 ngày 14 giờ UTC = 06:30 sáng ngày 15 giờ Việt Nam
+        $this->travelTo(Carbon::parse('2026-11-14 23:30:00', 'UTC'));
+        Order::factory()->status(OrderStatus::Completed)->create(['subtotal' => 250000, 'total' => 250000]);
+
+        $this->assertSame('2026-11-15 06:30', Order::first()->created_at->format('Y-m-d H:i'));
+        $this->assertSame(250000, $this->statistics->revenueToday());
+        $this->assertSame(['2026-11-15' => 250000], array_slice($this->statistics->revenueByDay(7), -1, 1, true));
+    }
+
     public function test_revenue_is_zero_when_there_are_no_orders(): void
     {
         $this->assertSame(0, $this->statistics->revenueToday());
