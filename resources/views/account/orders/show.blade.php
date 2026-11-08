@@ -79,7 +79,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Sản phẩm</th>
-                                <th class="text-end">Đơn giá (lúc mua)</th>
+                                <th class="text-end d-none d-sm-table-cell">Đơn giá (lúc mua)</th>
                                 <th class="text-center">SL</th>
                                 <th class="text-end">Thành tiền</th>
                             </tr>
@@ -90,12 +90,14 @@
                                 <tr>
                                     <td>
                                         {{ $item->product_name }}
+                                        {{-- Màn hình nhỏ (< 576px) ẩn cột Đơn giá → hiện đơn giá ngay dưới tên SP --}}
+                                        <div class="d-sm-none small text-secondary text-nowrap">@money($item->price)</div>
                                         {{-- Đơn hoàn thành → link sang khung đánh giá của SP (BR-07); SP đã ẩn thì không có link --}}
                                         @if ($order->status === \App\Enums\OrderStatus::Completed && $item->product?->is_active)
                                             <a href="{{ route('products.show', $item->product->slug) }}#danh-gia" class="d-block small">Đánh giá</a>
                                         @endif
                                     </td>
-                                    <td class="text-end text-nowrap">@money($item->price)</td>
+                                    <td class="text-end text-nowrap d-none d-sm-table-cell">@money($item->price)</td>
                                     <td class="text-center">{{ $item->quantity }}</td>
                                     <td class="text-end text-nowrap">@money($item->line_total)</td>
                                 </tr>
@@ -103,17 +105,20 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="3" class="text-end">Tạm tính</td>
+                                <td class="d-none d-sm-table-cell"></td>
+                                <td colspan="2" class="text-end">Tạm tính</td>
                                 <td class="text-end text-nowrap">@money($order->subtotal)</td>
                             </tr>
                             @if ($order->discount > 0)
                                 <tr>
-                                    <td colspan="3" class="text-end">Giảm giá</td>
+                                    <td class="d-none d-sm-table-cell"></td>
+                                    <td colspan="2" class="text-end">Giảm giá</td>
                                     <td class="text-end text-nowrap">−@money($order->discount)</td>
                                 </tr>
                             @endif
                             <tr>
-                                <th colspan="3" class="text-end">Tổng cộng</th>
+                                <td class="d-none d-sm-table-cell"></td>
+                                <th colspan="2" class="text-end">Tổng cộng</th>
                                 <th class="text-end text-nowrap">@money($order->total)</th>
                             </tr>
                         </tfoot>
