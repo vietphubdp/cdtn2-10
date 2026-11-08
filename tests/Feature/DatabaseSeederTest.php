@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\OrderStatus;
 use App\Models\Category;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -78,6 +79,16 @@ class DatabaseSeederTest extends TestCase
         $this->assertSame(14, Product::where('name', 'Tai nghe Sony WH-1000XM5')->value('stock'));
         // Đơn bị hủy được cộng lại kho: JBL Go 4 vẫn 40
         $this->assertSame(40, Product::where('name', 'Loa bluetooth JBL Go 4')->value('stock'));
+    }
+
+    public function test_seeder_creates_demo_coupons(): void
+    {
+        $this->seed();
+
+        $this->assertSame(['DON500K', 'GIAM10', 'GIAM50K', 'HETHAN'], Coupon::orderBy('code')->pluck('code')->all());
+        $this->assertSame(500000, Coupon::where('code', 'DON500K')->value('min_order'));
+        $this->assertTrue(Coupon::where('code', 'HETHAN')->first()->expires_at->isPast());
+        $this->assertSame('Đang áp dụng', Coupon::where('code', 'GIAM10')->first()->statusBadge()[0]);
     }
 
     public function test_performance_seeder_adds_500_products(): void
