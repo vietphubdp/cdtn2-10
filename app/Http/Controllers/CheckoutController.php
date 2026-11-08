@@ -5,14 +5,18 @@ namespace App\Http\Controllers;
 use App\Exceptions\BusinessException;
 use App\Http\Requests\ApplyCouponRequest;
 use App\Http\Requests\CheckoutRequest;
+use App\Mail\OrderPlacedMail;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Services\CartService;
 use App\Services\CouponService;
 use App\Services\OrderService;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 /**
- * Đặt hàng COD, xử lý qua OrderService (FR-07); áp mã giảm giá qua CouponService (FR-16).
+ * Đặt hàng COD, xử lý qua OrderService (FR-07); áp mã giảm giá qua CouponService (FR-16);
+ * gửi email xác nhận đơn (FR-18).
  * Mã khách đã áp lưu trong session key "coupon" (chỉ lưu chuỗi mã, mỗi lần dùng đều kiểm tra lại).
  */
 class CheckoutController extends Controller
@@ -77,6 +81,13 @@ class CheckoutController extends Controller
 
         $cart->clear();
         session()->forget(self::COUPON_KEY);
+
+        // Đơn đã lưu xong: gửi mail lỗi (sai cấu hình, mất mạng…) chỉ ghi log, không làm hỏng đơn
+        try {
+            Mail::to($request->user())->send(new OrderPlacedMail($order));
+        } catch (Throwable $e) {
+            report($e);
+        }
 
         return redirect()->route('checkout.success', $order->code);
     }
