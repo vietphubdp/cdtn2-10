@@ -14,9 +14,9 @@
             <div class="hero-banner h-100">
                 <div class="row g-4 align-items-center h-100">
                     <div class="col-md-8">
-                        <h1 class="display-title hero-title">Phụ kiện công nghệ hợp gu của bạn</h1>
+                        <h1 class="display-title hero-title">Phụ kiện công nghệ <em>hợp gu của bạn</em></h1>
                         <p class="hero-text">Tai nghe, sạc dự phòng, chuột, bàn phím… chính hãng, giá tốt mỗi ngày. Thanh toán khi nhận hàng.</p>
-                        <a href="{{ route('products.index') }}" class="btn btn-dark btn-lg px-5">Mua sắm ngay</a>
+                        <a href="{{ route('products.index') }}" class="btn btn-dark btn-lg">Mua sắm ngay @include('partials.icon', ['name' => 'arrow-right', 'size' => 18])</a>
 
                         <div class="hero-stats d-flex">
                             <div>
@@ -122,6 +122,9 @@
                         <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="bento-tile">
                             <span class="bento-name">{{ $category->name }}</span>
                             <span class="bento-count">{{ $category->products_count }} sản phẩm</span>
+                            @if ($cover = $category->products->first()?->image_url)
+                                <img class="bento-photo" src="{{ $cover }}" alt="" loading="lazy">
+                            @endif
                             <span class="bento-arrow">@include('partials.icon', ['name' => 'arrow-right', 'size' => 20])</span>
                         </a>
                     </div>
