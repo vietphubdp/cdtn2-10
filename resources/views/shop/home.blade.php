@@ -61,19 +61,29 @@
 
         {{-- Danh mục kèm số SP đang bán; bấm → /san-pham?category=<slug> --}}
         <div class="col-lg-4">
-            <div class="category-box h-100">
-                <h2 class="h6 fw-bold text-uppercase">Danh mục</h2>
-                <ul class="list-unstyled mb-0">
+            <section class="category-box" aria-labelledby="category-title">
+                <div class="category-box-heading">
+                    <h2 id="category-title">Danh mục</h2>
+                    <a href="{{ route('products.index') }}">Xem tất cả @include('partials.icon', ['name' => 'arrow-right', 'size' => 15])</a>
+                </div>
+                <ul class="category-grid list-unstyled mb-0">
                     @foreach ($categories as $category)
                         <li>
-                            <a href="{{ route('products.index', ['category' => $category->slug]) }}">
-                                <span>{{ $category->name }} ({{ $category->products_count }})</span>
-                                @include('partials.icon', ['name' => 'chevron-right', 'size' => 16])
+                            <a class="category-tile" href="{{ route('products.index', ['category' => $category->slug]) }}">
+                                <span class="category-tile-photo" aria-hidden="true">
+                                    @if ($imageUrl = $category->products->first()?->image_url)
+                                        <img src="{{ $imageUrl }}" alt="">
+                                    @else
+                                        @include('partials.icon', ['name' => 'cart', 'size' => 26])
+                                    @endif
+                                </span>
+                                <strong>{{ $category->name }}</strong>
+                                <small>{{ $category->products_count }} sản phẩm</small>
                             </a>
                         </li>
                     @endforeach
                 </ul>
-            </div>
+            </section>
         </div>
     </div>
 

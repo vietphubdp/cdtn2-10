@@ -23,6 +23,9 @@ class HomeController extends Controller
 
         // Khung "Danh mục": đếm số SP đang bán của từng danh mục
         $categories = Category::withCount(['products' => fn ($query) => $query->active()])
+            ->with(['products' => fn ($query) => $query->active()
+                ->whereNotNull('image')->where('image', '!=', '')
+                ->oldest('id')->limit(1)->select('id', 'category_id', 'image')])
             ->orderBy('name')
             ->get();
 

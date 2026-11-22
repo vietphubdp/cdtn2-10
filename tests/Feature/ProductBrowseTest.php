@@ -59,8 +59,11 @@ class ProductBrowseTest extends TestCase
         Product::factory()->hidden()->for($category)->create();
 
         $this->get(route('home'))
-            ->assertSee('Tai nghe (3)')
-            ->assertSee(route('products.index', ['category' => 'tai-nghe']), false);
+            ->assertSeeInOrder([
+                'class="category-tile" href="'.route('products.index', ['category' => 'tai-nghe']).'"',
+                '<strong>Tai nghe</strong>',
+                '<small>3 sản phẩm</small>',
+            ], false);
     }
 
     public function test_product_list_paginates_12_products_per_page(): void
