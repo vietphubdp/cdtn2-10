@@ -60,10 +60,23 @@ class ProductBrowseTest extends TestCase
 
         $this->get(route('home'))
             ->assertSeeInOrder([
-                'class="category-tile" href="'.route('products.index', ['category' => 'tai-nghe']).'"',
-                '<strong>Tai nghe</strong>',
-                '<small>3 sản phẩm</small>',
+                'class="category-row" href="'.route('products.index', ['category' => 'tai-nghe']).'"',
+                '<span class="text-truncate">Tai nghe</span>',
+                '<small class="visually-hidden">3 sản phẩm</small>',
             ], false);
+    }
+
+    public function test_home_category_list_paginates_six_at_a_time(): void
+    {
+        Category::factory()->count(7)->create();
+
+        $this->get(route('home'))->assertOk()
+            ->assertViewHas('visibleCategories', fn ($items) => $items->count() === 6)
+            ->assertSee(route('home', ['danh-muc' => 2]).'#danh-muc', false);
+
+        $this->get(route('home', ['danh-muc' => 2]))->assertOk()
+            ->assertViewHas('visibleCategories', fn ($items) => $items->count() === 1)
+            ->assertSee('2/2');
     }
 
     public function test_product_list_paginates_12_products_per_page(): void

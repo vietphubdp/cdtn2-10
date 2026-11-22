@@ -10,6 +10,7 @@
 /* ---------- 1. Bảng màu & biến chung ---------- */
 :root {
     --ts-brand: #2579f2;
+    --ts-brand-gradient: linear-gradient(110deg, #124996, var(--ts-brand) 75%, #1875bf);
     --ts-brand-dark: #165ec5;
     --ts-brand-rgb: 37, 121, 242;
     --ts-ink: #17191e;
@@ -856,7 +857,7 @@ hr {
     margin-top: -5.5rem;
     padding: 2.25rem 2.5rem;
     border-radius: 20px;
-    background: linear-gradient(110deg, #124996, var(--ts-brand) 75%, #1875bf);
+    background: var(--ts-brand-gradient);
     color: #fff;
 }
 
@@ -1128,88 +1129,83 @@ hr {
 
 /* Khung danh mục cạnh banner */
 .category-box {
-    padding: clamp(1rem, 2vw, 1.5rem);
-    border: 1px solid #dce5f0;
-    border-radius: 20px;
     background: #fff;
+    border: 1px solid #dce5eb;
+    border-radius: 1.25rem;
+    box-shadow: 0 5px 20px rgba(22, 52, 72, 0.06);
+    scroll-margin-top: 9rem;
 }
 
-.category-box-heading {
+.category-list { padding: 0.75rem 0.6rem; }
+
+@media (min-width: 992px) {
+    .category-box {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .category-list {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+    }
+}
+
+.category-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-
-.category-box-heading h2 {
-    margin: 0;
-    font-size: 1.35rem;
-    font-weight: 750;
-    letter-spacing: -0.035em;
-}
-
-.category-box-heading a {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: var(--ts-brand-dark);
-    font-size: 0.85rem;
+    gap: 1rem;
+    min-height: 3rem;
+    padding: 0.55rem 1rem;
+    border-radius: 0.7rem;
+    color: #2a4055;
     font-weight: 600;
 }
 
-.category-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.65rem;
+.category-row .icon {
+    flex-shrink: 0;
+    color: #8999a8;
 }
 
-.category-tile {
-    height: 100%;
+.category-row:is(:hover, :focus-visible) {
+    background: #eff6ff;
+    color: var(--ts-brand-dark);
+}
+
+.category-pager {
     display: flex;
-    flex-direction: column;
-    padding: 0.7rem;
-    border: 1px solid #e4eaf2;
-    border-radius: 0.85rem;
-    background: #f7f9fc;
-    color: var(--ts-ink);
-    overflow-wrap: anywhere;
+    align-items: center;
+    gap: 0.5rem;
+    border-top: 1px solid #e4e9ed;
+    padding: 0.5rem 1rem 0.5rem 1.6rem;
+    color: #526579;
+    font-variant-numeric: tabular-nums;
 }
 
-.category-tile-photo {
+.category-pager > span { margin-right: auto; }
+
+.category-step {
     display: grid;
     place-items: center;
-    height: 3.4rem;
-    margin-bottom: 0.45rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    background: white;
     color: var(--ts-brand-dark);
 }
 
-.category-tile-photo img {
-    width: 100%;
-    height: 3.4rem;
-    object-fit: contain;
-    mix-blend-mode: multiply;
-    border-radius: 0.45rem;
-}
-
-.category-tile strong { font-size: 0.92rem; }
-.category-tile small { color: #52647b; font-size: 0.77rem; }
-
-.category-tile:is(:hover, :focus-visible) {
-    color: var(--ts-brand-dark);
-    background: #eef5ff;
-    border-color: var(--ts-brand);
-}
-
-@media (min-width: 576px) and (max-width: 991.98px) {
-    .category-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
+.category-step:nth-child(2) .icon { transform: rotate(180deg); }
+.category-step:disabled { color: #c4cdd4; }
+.category-step:is(a):hover { background: #eff6ff; }
 
 /* Dải xanh cam kết của shop */
 .promise-strip {
-    background-color: #e9f8f2;
-    border-block: 1px solid #cce9df;
-    color: #174b42;
+    background: var(--ts-brand-gradient);
+    color: #fff;
     padding: 1.6rem 0;
 }
 
@@ -1378,6 +1374,20 @@ hr {
 
 .product-card-img img {
     transition: transform 0.35s ease;
+}
+
+.ratio > .sale-badge {
+    inset: 0.6rem 0.6rem auto auto;
+    width: auto;
+    height: auto;
+    padding: 0.3rem 0.7rem;
+    border-radius: 2rem;
+    background: #b82140;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1.3;
+    pointer-events: none;
 }
 
 .product-card:hover .product-card-img img {

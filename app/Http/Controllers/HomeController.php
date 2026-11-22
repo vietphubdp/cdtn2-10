@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
     /**
      * Trang chủ: SP mới, SP khuyến mãi (FR-03, T-08).
      */
-    public function index()
+    public function index(Request $request)
     {
         // Chỉ hiện SP đang bán (BR-02), mỗi khu tối đa 8 SP
         $newProducts = Product::active()->latest('id')->take(8)->get();
@@ -29,6 +30,11 @@ class HomeController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('shop.home', compact('newProducts', 'saleProducts', 'categories'));
+        $perPage = 6;
+        $categoryPages = max(1, (int) ceil($categories->count() / $perPage));
+        $categoryPage = min($categoryPages, max(1, $request->integer('danh-muc', 1)));
+        $visibleCategories = $categories->forPage($categoryPage, $perPage);
+
+        return view('shop.home', compact('newProducts', 'saleProducts', 'categories', 'visibleCategories', 'categoryPage', 'categoryPages'));
     }
 }

@@ -9,6 +9,9 @@
         @else
             <span class="d-flex align-items-center justify-content-center text-secondary small">Chưa có ảnh</span>
         @endif
+        @if ($product->is_on_sale)
+            <span class="sale-badge">Sale</span>
+        @endif
     </a>
 
     <div class="product-card-body d-flex flex-column flex-grow-1">

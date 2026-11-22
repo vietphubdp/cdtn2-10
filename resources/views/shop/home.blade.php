@@ -61,28 +61,37 @@
 
         {{-- Danh mục kèm số SP đang bán; bấm → /san-pham?category=<slug> --}}
         <div class="col-lg-4">
-            <section class="category-box" aria-labelledby="category-title">
-                <div class="category-box-heading">
-                    <h2 id="category-title">Danh mục</h2>
-                    <a href="{{ route('products.index') }}">Xem tất cả @include('partials.icon', ['name' => 'arrow-right', 'size' => 15])</a>
-                </div>
-                <ul class="category-grid list-unstyled mb-0">
-                    @foreach ($categories as $category)
+            <section id="danh-muc" class="category-box" aria-label="Danh mục sản phẩm">
+                <ul class="category-list list-unstyled mb-0">
+                    @forelse ($visibleCategories as $category)
                         <li>
-                            <a class="category-tile" href="{{ route('products.index', ['category' => $category->slug]) }}">
-                                <span class="category-tile-photo" aria-hidden="true">
-                                    @if ($imageUrl = $category->products->first()?->image_url)
-                                        <img src="{{ $imageUrl }}" alt="">
-                                    @else
-                                        @include('partials.icon', ['name' => 'cart', 'size' => 26])
-                                    @endif
-                                </span>
-                                <strong>{{ $category->name }}</strong>
-                                <small>{{ $category->products_count }} sản phẩm</small>
+                            <a class="category-row" href="{{ route('products.index', ['category' => $category->slug]) }}">
+                                <span class="text-truncate">{{ $category->name }}</span>
+                                <small class="visually-hidden">{{ $category->products_count }} sản phẩm</small>
+                                @include('partials.icon', ['name' => 'chevron-right', 'size' => 20])
                             </a>
                         </li>
-                    @endforeach
+                    @empty
+                        <li class="p-3 text-secondary">Chưa có danh mục.</li>
+                    @endforelse
                 </ul>
+                @if ($categories->isNotEmpty())
+                    <nav class="category-pager" aria-label="Phân trang danh mục">
+                        <span aria-label="Trang {{ $categoryPage }} trên {{ $categoryPages }}">{{ $categoryPage }}/{{ $categoryPages }}</span>
+                        @foreach ([-1 => 'Trang trước', 1 => 'Trang sau'] as $step => $label)
+                            @php($target = $categoryPage + $step)
+                            @if ($target >= 1 && $target <= $categoryPages)
+                                <a class="category-step" href="{{ route('home', ['danh-muc' => $target]) }}#danh-muc" aria-label="{{ $label }}">
+                                    @include('partials.icon', ['name' => 'chevron-right', 'size' => 18])
+                                </a>
+                            @else
+                                <button class="category-step" type="button" disabled aria-label="{{ $label }}">
+                                    @include('partials.icon', ['name' => 'chevron-right', 'size' => 18])
+                                </button>
+                            @endif
+                        @endforeach
+                    </nav>
+                @endif
             </section>
         </div>
     </div>
