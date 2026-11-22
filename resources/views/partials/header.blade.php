@@ -58,9 +58,11 @@
                     </a>
                 @endauth
 
-                <a href="{{ route('cart.index') }}" class="btn btn-dark header-btn text-nowrap">
+                <a href="{{ route('cart.index') }}" class="btn btn-dark header-btn text-nowrap"
+                   aria-label="Giỏ hàng, {{ $cartCount }} sản phẩm">
                     @include('partials.icon', ['name' => 'cart'])
-                    <span class="visually-hidden d-sm-none">Giỏ hàng</span><span class="d-none d-sm-inline">Giỏ hàng</span> <span class="badge text-bg-light">{{ $cartCount }}</span>
+                    <span class="d-none d-md-inline">Giỏ hàng</span>
+                    <span class="badge text-bg-light">{{ $cartCount }}</span>
                 </a>
             </div>
         </div>
