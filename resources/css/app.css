@@ -760,7 +760,58 @@ hr {
 }
 
 .site-nav .nav {
+    overflow-x: auto;
     scrollbar-width: none;
+}
+
+.shop-menu-toggle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #ccdcf2;
+    border-radius: 12px;
+    color: var(--ts-brand-dark);
+    background: #eef5ff;
+}
+
+@media (min-width: 768px) {
+    .site-nav {
+        background-color: white !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    #shopMenu {
+        --bs-offcanvas-width: min(21rem, 88vw);
+    }
+
+    #shopMenu .offcanvas-header {
+        border-bottom: 1px solid var(--ts-line);
+        color: var(--ts-brand-dark);
+    }
+
+    #shopMenu .container {
+        padding: 0;
+    }
+
+    #shopMenu .nav {
+        flex-direction: column;
+    }
+
+    #shopMenu .nav-link {
+        margin: 0 !important;
+        padding: 0.8rem 1rem !important;
+        border-radius: 0.65rem;
+    }
+
+    #shopMenu .nav-link.fw-bold {
+        background: #eef5ff;
+    }
+
+    #shopMenu .nav-link.fw-bold::after {
+        display: none;
+    }
 }
 
 .site-nav .nav::-webkit-scrollbar {
