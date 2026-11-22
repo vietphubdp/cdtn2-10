@@ -10,7 +10,7 @@
     <div class="container py-3">
         <div class="row g-2 g-md-4 align-items-center">
             <div class="col-auto">
-                <a href="{{ route('home') }}" class="site-logo text-decoration-none">CDTN2-10</a>
+                <a href="{{ route('home') }}" class="site-logo text-decoration-none">TECHSHOP</a>
             </div>
 
             {{-- Ô tìm kiếm: gửi ?q= sang trang danh sách SP (FR-04). Màn hình nhỏ xuống dòng riêng --}}

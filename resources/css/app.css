@@ -4,11 +4,14 @@
 /*
  * Giao diện TechShop: chỉnh lại màu, chữ, bo góc, đổ bóng trên nền Bootstrap.
  * Chỉ đè biến và class có sẵn của Bootstrap; không đổi cấu trúc HTML.
- * Màu chính: mực đậm (--ts-ink) cho nút, nhấn cam (--ts-accent) cho giá KM, mục đang chọn.
+ * Màu chính: xanh TechShop (--ts-brand) cho nút và các điểm nhấn.
  */
 
 /* ---------- 1. Bảng màu & biến chung ---------- */
 :root {
+    --ts-brand: #2579f2;
+    --ts-brand-dark: #165ec5;
+    --ts-brand-rgb: 37, 121, 242;
     --ts-ink: #17191e;
     --ts-ink-rgb: 23, 25, 30;
     --ts-ink-2: #3a3e47;
@@ -19,9 +22,9 @@
     --ts-paper-rgb: 250, 249, 246;
     --ts-surface: #ffffff;
     --ts-soft: #efece5;
-    --ts-accent: #e0531f;
-    --ts-accent-rgb: 224, 83, 31;
-    --ts-accent-dark: #b9410f;
+    --ts-accent: var(--ts-brand);
+    --ts-accent-rgb: var(--ts-brand-rgb);
+    --ts-accent-dark: var(--ts-brand-dark);
     --ts-radius: 0.75rem;
     --ts-radius-sm: 0.5rem;
     --ts-shadow-sm: 0 1px 2px rgba(23, 25, 30, 0.04), 0 1px 3px rgba(23, 25, 30, 0.06);
@@ -49,7 +52,7 @@
     --bs-border-radius-sm: 0.375rem;
     --bs-border-radius-lg: var(--ts-radius);
     --bs-link-color: var(--ts-accent-dark);
-    --bs-link-color-rgb: 185, 65, 15;
+    --bs-link-color-rgb: 22, 94, 197;
     --bs-link-hover-color: var(--ts-accent);
     --bs-link-hover-color-rgb: var(--ts-accent-rgb);
     --bs-focus-ring-color: rgba(var(--ts-accent-rgb), 0.25);
@@ -115,23 +118,23 @@ a {
 }
 
 .btn-dark {
-    --bs-btn-bg: var(--ts-ink);
-    --bs-btn-border-color: var(--ts-ink);
-    --bs-btn-hover-bg: #2b2f37;
-    --bs-btn-hover-border-color: #2b2f37;
-    --bs-btn-active-bg: #000;
-    --bs-btn-active-border-color: #000;
-    --bs-btn-disabled-bg: var(--ts-ink);
-    --bs-btn-disabled-border-color: var(--ts-ink);
+    --bs-btn-bg: var(--ts-brand);
+    --bs-btn-border-color: var(--ts-brand);
+    --bs-btn-hover-bg: var(--ts-brand-dark);
+    --bs-btn-hover-border-color: var(--ts-brand-dark);
+    --bs-btn-active-bg: var(--ts-brand-dark);
+    --bs-btn-active-border-color: var(--ts-brand-dark);
+    --bs-btn-disabled-bg: var(--ts-brand);
+    --bs-btn-disabled-border-color: var(--ts-brand);
 }
 
 .btn-outline-dark {
     --bs-btn-color: var(--ts-ink);
     --bs-btn-border-color: var(--ts-line-strong);
-    --bs-btn-hover-bg: var(--ts-ink);
-    --bs-btn-hover-border-color: var(--ts-ink);
-    --bs-btn-active-bg: var(--ts-ink);
-    --bs-btn-active-border-color: var(--ts-ink);
+    --bs-btn-hover-bg: var(--ts-brand);
+    --bs-btn-hover-border-color: var(--ts-brand);
+    --bs-btn-active-bg: var(--ts-brand);
+    --bs-btn-active-border-color: var(--ts-brand);
     background-color: var(--ts-surface);
 }
 
@@ -153,10 +156,10 @@ a {
     --bs-btn-color: var(--ts-ink);
     --bs-btn-border-color: var(--ts-line-strong);
     --bs-btn-hover-color: #fff;
-    --bs-btn-hover-bg: var(--ts-ink);
-    --bs-btn-hover-border-color: var(--ts-ink);
-    --bs-btn-active-bg: var(--ts-ink);
-    --bs-btn-active-border-color: var(--ts-ink);
+    --bs-btn-hover-bg: var(--ts-brand);
+    --bs-btn-hover-border-color: var(--ts-brand);
+    --bs-btn-active-bg: var(--ts-brand);
+    --bs-btn-active-border-color: var(--ts-brand);
     background-color: var(--ts-surface);
 }
 
@@ -216,7 +219,7 @@ a {
 
 .form-control:focus,
 .form-select:focus {
-    border-color: var(--ts-ink);
+    border-color: var(--ts-brand);
     box-shadow: var(--ts-ring);
 }
 
@@ -235,12 +238,12 @@ a {
 }
 
 .form-check-input:checked {
-    background-color: var(--ts-ink);
-    border-color: var(--ts-ink);
+    background-color: var(--ts-brand);
+    border-color: var(--ts-brand);
 }
 
 .form-check-input:focus {
-    border-color: var(--ts-ink);
+    border-color: var(--ts-brand);
     box-shadow: var(--ts-ring);
 }
 
@@ -406,8 +409,8 @@ a {
     --bs-pagination-focus-box-shadow: var(--ts-ring);
     --bs-pagination-focus-bg: var(--ts-soft);
     --bs-pagination-focus-color: var(--ts-ink);
-    --bs-pagination-active-bg: var(--ts-ink);
-    --bs-pagination-active-border-color: var(--ts-ink);
+    --bs-pagination-active-bg: var(--ts-brand);
+    --bs-pagination-active-border-color: var(--ts-brand);
     --bs-pagination-disabled-color: #b3afa6;
     --bs-pagination-disabled-bg: var(--ts-surface);
     --bs-pagination-disabled-border-color: var(--ts-line);
@@ -442,7 +445,7 @@ a {
     --bs-dropdown-border-color: var(--ts-line);
     --bs-dropdown-border-radius: var(--ts-radius);
     --bs-dropdown-link-hover-bg: var(--ts-paper);
-    --bs-dropdown-link-active-bg: var(--ts-ink);
+    --bs-dropdown-link-active-bg: var(--ts-brand);
     --bs-dropdown-item-padding-y: 0.45rem;
     --bs-dropdown-divider-bg: var(--ts-line);
     padding: 0.4rem;
@@ -458,7 +461,7 @@ hr {
     opacity: 1;
 }
 
-/* ---------- 7. Trang khách: tông đen – trắng, bo tròn lớn, nút viên thuốc ---------- */
+/* ---------- 7. Trang khách: tông xanh – trắng, bo tròn lớn, nút viên thuốc ---------- */
 /* Đè lại biến màu chỉ trong trang khách (body.shop-body); trang quản trị giữ nguyên */
 .shop-body {
     --ts-ink: #000;
@@ -469,9 +472,9 @@ hr {
     --ts-line-strong: rgba(0, 0, 0, 0.16);
     --ts-paper: #f0f0f0;
     --ts-soft: #f0eeed;
-    --ts-accent: #000;
-    --ts-accent-rgb: 0, 0, 0;
-    --ts-accent-dark: #000;
+    --ts-accent: var(--ts-brand);
+    --ts-accent-rgb: var(--ts-brand-rgb);
+    --ts-accent-dark: var(--ts-brand-dark);
     --ts-radius: 20px;
     --ts-radius-sm: 62px;
     --ts-ring: 0 0 0 0.2rem rgba(0, 0, 0, 0.12);
@@ -486,10 +489,10 @@ hr {
     --bs-border-color: rgba(0, 0, 0, 0.1);
     --bs-dark: #000;
     --bs-dark-rgb: 0, 0, 0;
-    --bs-link-color: #000;
-    --bs-link-color-rgb: 0, 0, 0;
-    --bs-link-hover-color: rgba(0, 0, 0, 0.6);
-    --bs-link-hover-color-rgb: 0, 0, 0;
+    --bs-link-color: var(--ts-brand-dark);
+    --bs-link-color-rgb: 22, 94, 197;
+    --bs-link-hover-color: var(--ts-brand);
+    --bs-link-hover-color-rgb: var(--ts-brand-rgb);
     --bs-focus-ring-color: rgba(0, 0, 0, 0.15);
     background-color: #fff;
     overflow-x: clip;
@@ -526,7 +529,7 @@ hr {
     border-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Nút: viên thuốc, đen/viền */
+/* Nút: viên thuốc, nút đặc và nút viền */
 .shop-body .btn {
     --bs-btn-padding-x: 1.4rem;
     --bs-btn-padding-y: 0.6rem;
@@ -542,11 +545,6 @@ hr {
     --bs-btn-padding-x: 0.9rem;
     --bs-btn-padding-y: 0.35rem;
     --bs-btn-border-radius: 62px;
-}
-
-.shop-body .btn-dark {
-    --bs-btn-hover-bg: #262626;
-    --bs-btn-hover-border-color: #262626;
 }
 
 .shop-body .btn-outline-dark,
@@ -588,7 +586,7 @@ hr {
 .shop-body .form-control:focus,
 .shop-body .form-select:focus {
     background-color: #fff;
-    border-color: #000;
+    border-color: var(--ts-brand);
 }
 
 .shop-body .form-control.is-invalid {
@@ -642,13 +640,13 @@ hr {
     color: #000;
 }
 
-/* Phân trang: số trần, trang đang chọn nền xám */
+/* Phân trang: số trần, trang đang chọn nền xanh */
 .shop-body .pagination {
     --bs-pagination-border-color: transparent;
     --bs-pagination-hover-border-color: transparent;
     --bs-pagination-hover-bg: #f0f0f0;
-    --bs-pagination-active-bg: #f0f0f0;
-    --bs-pagination-active-color: #000;
+    --bs-pagination-active-bg: var(--ts-brand);
+    --bs-pagination-active-color: white;
     --bs-pagination-active-border-color: transparent;
     --bs-pagination-disabled-border-color: transparent;
     --bs-pagination-color: rgba(0, 0, 0, 0.6);
@@ -678,7 +676,7 @@ hr {
 
 /* ---------- 8. Đầu trang, menu danh mục, chân trang ---------- */
 .announce-bar {
-    background-color: #000;
+    background-color: var(--ts-brand);
     color: #fff;
 }
 
@@ -702,7 +700,7 @@ hr {
     font-weight: 800;
     letter-spacing: -0.02em;
     line-height: 1;
-    color: #000 !important;
+    color: var(--ts-brand-dark) !important;
 }
 
 /* Ô tìm kiếm dạng viên thuốc có kính lúp */
@@ -741,7 +739,7 @@ hr {
 
 .site-header .btn-dark .badge {
     background-color: #fff !important;
-    color: #000 !important;
+    color: var(--ts-brand-dark) !important;
     min-width: 1.5rem;
 }
 
@@ -779,7 +777,7 @@ hr {
 
 .site-nav .nav-link:hover,
 .site-nav .nav-link.fw-bold {
-    color: #000 !important;
+    color: var(--ts-brand-dark) !important;
 }
 
 .site-nav .nav-link.fw-bold::after {
@@ -789,16 +787,16 @@ hr {
     right: 0.5rem;
     bottom: 0;
     height: 2px;
-    background-color: #000;
+    background-color: var(--ts-brand);
 }
 
-/* Chừa chỗ dưới nội dung cho khung đen của chân trang nổi lên */
+/* Chừa chỗ dưới nội dung cho khung xanh của chân trang nổi lên */
 .shop-body > main {
     padding-top: 1.5rem !important;
     padding-bottom: 9rem !important;
 }
 
-/* Chân trang nền xám; khung đen nổi lên nửa trên */
+/* Chân trang nền xám; khung xanh nổi lên nửa trên */
 .site-footer {
     background-color: #f0f0f0;
 }
@@ -807,7 +805,7 @@ hr {
     margin-top: -5.5rem;
     padding: 2.25rem 2.5rem;
     border-radius: 20px;
-    background-color: #000;
+    background-color: var(--ts-brand);
     color: #fff;
 }
 
@@ -1019,7 +1017,7 @@ hr {
     gap: 0.75rem;
     padding: 1.4rem;
     border-radius: 20px;
-    background-color: #000;
+    background-color: var(--ts-brand);
     color: #fff;
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
     transform: translate(-50%, -50%) rotate(-4deg);
@@ -1055,7 +1053,7 @@ hr {
     align-items: center;
     gap: 0.4rem;
     font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: white;
 }
 
 /* Khung danh mục cạnh banner */
@@ -1084,9 +1082,9 @@ hr {
     padding-left: 0.35rem;
 }
 
-/* Dải đen cam kết của shop */
+/* Dải xanh cam kết của shop */
 .promise-strip {
-    background-color: #000;
+    background-color: var(--ts-brand);
     color: #fff;
     padding: 1.6rem 0;
 }
@@ -1194,7 +1192,7 @@ hr {
     width: 2.75rem;
     height: 2.75rem;
     border-radius: 50%;
-    background-color: #000;
+    background-color: var(--ts-brand);
     color: #fff;
 }
 
@@ -1670,13 +1668,13 @@ hr {
 }
 
 .shop-body .nav.flex-column .nav-link.fw-bold {
-    background-color: #000;
+    background-color: var(--ts-brand);
     color: #fff !important;
 }
 
 /* ---------- 11. Trang quản trị ---------- */
 .admin-topbar {
-    background-color: var(--ts-ink) !important;
+    background-color: var(--ts-brand-dark) !important;
 }
 
 .admin-topbar .navbar-brand,
@@ -1699,7 +1697,7 @@ hr {
 }
 
 #adminSidebar {
-    background-color: var(--ts-ink) !important;
+    background-color: var(--ts-brand-dark) !important;
 }
 
 @media (min-width: 992px) {
