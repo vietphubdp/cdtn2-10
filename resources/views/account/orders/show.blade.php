@@ -15,13 +15,13 @@
 
 @section('content')
     <div class="row g-4">
-        <div class="col-lg-3">
+        <div class="col-lg-3 order-last order-lg-first">
             @include('partials.account-sidebar')
         </div>
 
-        <div class="col-lg-9">
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-                <h1 class="h3 fw-bold mb-0">Đơn hàng {{ $order->code }}</h1>
+        <div class="col-lg-9 order-detail">
+            <header class="order-heading d-flex flex-wrap align-items-center gap-3 mb-3">
+                <h1 class="mb-0">Đơn hàng {{ $order->code }}</h1>
                 <span class="badge text-bg-{{ $order->status->color() }}">{{ $order->status->label() }}</span>
 
                 {{-- BR-05: nút hủy chỉ hiện khi đơn còn chờ xác nhận --}}
@@ -33,27 +33,29 @@
                         <button type="submit" class="btn btn-outline-danger">Hủy đơn</button>
                     </form>
                 @endif
-            </div>
+            </header>
 
             @if ($currentStep === false)
                 <div class="alert alert-secondary">Đơn hàng đã bị hủy.</div>
             @else
-                <div class="step-bar row g-0 text-center small border rounded overflow-hidden mb-3">
+                <ol class="order-track" aria-label="Tiến trình đơn hàng">
                     @foreach ($steps as $index => $step)
-                        <div @class(['col-6 col-md-3 py-2', 'bg-dark text-white' => $index <= $currentStep, 'bg-light text-secondary' => $index > $currentStep])>
-                            {{ $index <= $currentStep ? '●' : '○' }} {{ $step->label() }}
+                        <li @class(['is-reached' => $index <= $currentStep])
+                            @if ($index === $currentStep) aria-current="step" @endif>
+                            <span class="order-marker" aria-hidden="true">{{ $index < $currentStep ? '✓' : $index + 1 }}</span>
+                            <strong>{{ $step->label() }}</strong>
                             @if ($index === 0)
-                                <div class="small">{{ $order->created_at->format('d/m H:i') }}</div>
+                                <small>{{ $order->created_at->format('d/m H:i') }}</small>
                             @endif
-                        </div>
+                        </li>
                     @endforeach
-                </div>
+                </ol>
             @endif
 
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <div class="p-3 bg-white border rounded h-100">
-                        <h2 class="h6 fw-bold text-uppercase">Người nhận</h2>
+                    <div class="order-info h-100">
+                        <h2>@include('partials.icon', ['name' => 'truck']) Người nhận</h2>
                         <div>{{ $order->receiver_name }} · {{ $order->receiver_phone }}</div>
                         <div>{{ $order->shipping_address }}</div>
                         @if ($order->note)
@@ -62,8 +64,8 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="p-3 bg-white border rounded h-100">
-                        <h2 class="h6 fw-bold text-uppercase">Thanh toán</h2>
+                    <div class="order-info h-100">
+                        <h2>@include('partials.icon', ['name' => 'cash']) Thanh toán</h2>
                         <div>COD – thanh toán khi nhận hàng</div>
                         @if ($order->coupon)
                             <div>Mã giảm giá: {{ $order->coupon->code }}</div>
@@ -73,7 +75,7 @@
                 </div>
             </div>
 
-            <div class="bg-white border rounded">
+            <section class="order-receipt" aria-label="Chi tiết thanh toán">
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
                         <thead class="table-light">
@@ -103,28 +105,16 @@
                                 </tr>
                             @endforeach
                         </tbody>
-                        <tfoot>
-                            <tr>
-                                <td class="d-none d-sm-table-cell"></td>
-                                <td colspan="2" class="text-end">Tạm tính</td>
-                                <td class="text-end text-nowrap">@money($order->subtotal)</td>
-                            </tr>
-                            @if ($order->discount > 0)
-                                <tr>
-                                    <td class="d-none d-sm-table-cell"></td>
-                                    <td colspan="2" class="text-end">Giảm giá</td>
-                                    <td class="text-end text-nowrap">−@money($order->discount)</td>
-                                </tr>
-                            @endif
-                            <tr>
-                                <td class="d-none d-sm-table-cell"></td>
-                                <th colspan="2" class="text-end">Tổng cộng</th>
-                                <th class="text-end text-nowrap">@money($order->total)</th>
-                            </tr>
-                        </tfoot>
                     </table>
                 </div>
-            </div>
+                <dl class="order-totals mb-0">
+                    <div><dt>Tạm tính</dt><dd>@money($order->subtotal)</dd></div>
+                    @if ($order->discount > 0)
+                        <div><dt>Giảm giá</dt><dd>−@money($order->discount)</dd></div>
+                    @endif
+                    <div class="order-grand-total"><dt>Tổng cộng</dt><dd>@money($order->total)</dd></div>
+                </dl>
+            </section>
 
             <a href="{{ route('orders.index') }}" class="btn btn-link px-0 mt-3">← Quay lại danh sách đơn</a>
         </div>
