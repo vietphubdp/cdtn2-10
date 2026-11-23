@@ -933,14 +933,12 @@ hr {
     min-height: 22rem;
     padding: 2.5rem;
     border-radius: 20px;
-    border: 1px solid #ccdeef;
-    background:
-        radial-gradient(ellipse at 100% 0%, #b8f3de, transparent 52%),
-        linear-gradient(125deg, #f5fbff 8%, #dcecff 60%, #bdd6fd);
+    background: var(--ts-brand-gradient);
+    color: white;
 }
 
 .hero-title {
-    color: #102a48;
+    color: inherit;
     font-size: clamp(2.15rem, 1.15rem + 2.4vw, 3.45rem);
     text-transform: none;
     line-height: 1.07;
@@ -951,8 +949,15 @@ hr {
 
 .hero-title em {
     display: block;
-    color: var(--ts-brand-dark);
+    color: #e0efff;
     font-style: normal;
+}
+
+.hero-banner .btn-light {
+    --bs-btn-color: var(--ts-brand-dark);
+    --bs-btn-hover-color: #124996;
+    --bs-btn-hover-bg: #e0efff;
+    --bs-btn-hover-border-color: #e0efff;
 }
 
 .hero-banner .btn .icon {
@@ -960,7 +965,6 @@ hr {
 }
 
 .hero-text {
-    color: rgba(0, 0, 0, 0.6);
     max-width: 30rem;
     margin-bottom: 1.75rem;
 }
@@ -973,7 +977,7 @@ hr {
 .hero-stats > div {
     padding-right: 1.1rem;
     margin-right: 1.1rem;
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid rgb(255 255 255 / 35%);
 }
 
 .hero-stats > div:last-child {
@@ -989,7 +993,6 @@ hr {
 
 .hero-stat-label {
     font-size: 0.85rem;
-    color: rgba(0, 0, 0, 0.6);
 }
 
 .hero-stat-value,
@@ -1017,27 +1020,11 @@ hr {
     }
 }
 
-/* Ảnh SP xếp chồng + ngôi sao trang trí bên phải banner */
+/* Ảnh SP xếp chồng bên phải banner */
 .hero-visual {
     position: relative;
     height: 100%;
     min-height: 18rem;
-}
-
-.hero-spark {
-    position: absolute;
-    color: var(--ts-brand-dark);
-    z-index: 2;
-}
-
-.hero-spark-lg {
-    top: 0;
-    right: 0;
-}
-
-.hero-spark-sm {
-    bottom: 1.5rem;
-    left: 0;
 }
 
 .hero-shot {
@@ -1975,6 +1962,38 @@ hr {
 }
 
 /* Trang đặt hàng thành công */
+.shop-body .cart-notice {
+    position: fixed;
+    z-index: 1030;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: flex;
+    gap: 0.7rem;
+    width: min(24rem, calc(100% - 2rem));
+    margin: 0;
+    padding: 1rem 3rem 1rem 1rem;
+    border: 1px solid #b8dfce;
+    border-radius: 1rem;
+    background: white;
+    color: #173d32;
+    box-shadow: 0 8px 32px rgb(21 55 49 / 18%);
+    overflow-wrap: anywhere;
+}
+.cart-notice > .icon { flex: none; color: #17704e; }
+.order-confirmation-next {
+    margin: 1rem 0;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid #cddff4;
+    border-radius: 1rem;
+    background: linear-gradient(110deg, #edf5ff, #effaf6);
+}
+.order-confirmation-code {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    color: #153755;
+}
+
 .success-icon {
     width: 4.5rem;
     height: 4.5rem;

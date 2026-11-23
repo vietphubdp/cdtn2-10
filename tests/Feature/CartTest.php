@@ -113,8 +113,11 @@ class CartTest extends TestCase
             ->assertSessionHas('success', 'Đã thêm "Chuột không dây M1" vào giỏ hàng.')
             ->assertSessionHas('cart', [$product->id => 1]);
 
-        $this->get(route('home'))
-            ->assertSee('Giỏ hàng <span class="badge text-bg-light">1</span>', false);
+        $this->get(route('products.index'))
+            ->assertSee('aria-label="Giỏ hàng, 1 sản phẩm"', false)
+            ->assertSee('<span class="badge text-bg-light">1</span>', false)
+            ->assertSeeText('Đã thêm "Chuột không dây M1" vào giỏ hàng.')
+            ->assertSeeText('Xem giỏ hàng');
     }
 
     public function test_adding_same_product_again_adds_up_quantity(): void

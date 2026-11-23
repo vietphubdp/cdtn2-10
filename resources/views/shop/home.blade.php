@@ -16,7 +16,7 @@
                     <div class="col-md-8">
                         <h1 class="display-title hero-title">Phụ kiện công nghệ <em>hợp gu của bạn</em></h1>
                         <p class="hero-text">Tai nghe, sạc dự phòng, chuột, bàn phím… chính hãng, giá tốt mỗi ngày. Thanh toán khi nhận hàng.</p>
-                        <a href="{{ route('products.index') }}" class="btn btn-dark btn-lg">Mua sắm ngay @include('partials.icon', ['name' => 'arrow-right', 'size' => 18])</a>
+                        <a href="{{ route('products.index') }}" class="btn btn-light btn-lg">Mua sắm ngay @include('partials.icon', ['name' => 'arrow-right', 'size' => 18])</a>
 
                         <div class="hero-stats d-flex">
                             <div>
@@ -36,8 +36,6 @@
 
                     <div class="col-md-4 d-none d-md-block">
                         <div class="hero-visual">
-                            <span class="hero-spark hero-spark-lg">@include('partials.icon', ['name' => 'sparkle', 'size' => 64])</span>
-                            <span class="hero-spark hero-spark-sm">@include('partials.icon', ['name' => 'sparkle', 'size' => 36])</span>
                             @forelse ($heroProducts as $product)
                                 <a href="{{ route('products.show', $product->slug) }}" class="hero-shot hero-shot-{{ $loop->iteration }}">
                                     <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
