@@ -9,8 +9,13 @@
 <header class="site-header bg-white">
     <div class="container py-3">
         <div class="row g-2 g-md-4 align-items-center">
-            <div class="col-auto">
-                <a href="{{ route('home') }}" class="site-logo text-decoration-none">CDTN2-10</a>
+            <div class="col-auto d-flex align-items-center gap-2">
+                <button type="button" class="shop-menu-toggle d-md-none"
+                        data-bs-toggle="offcanvas" data-bs-target="#shopMenu"
+                        aria-controls="shopMenu" aria-label="Mở menu điều hướng">
+                    @include('partials.icon', ['name' => 'menu', 'size' => 22])
+                </button>
+                <a href="{{ route('home') }}" class="site-logo text-decoration-none">TECHSHOP</a>
             </div>
 
             {{-- Ô tìm kiếm: gửi ?q= sang trang danh sách SP (FR-04). Màn hình nhỏ xuống dòng riêng --}}
@@ -26,7 +31,7 @@
             <div class="col-auto ms-auto d-flex align-items-center gap-2">
                 @auth
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary header-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-outline-secondary header-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menu tài khoản">
                             @include('partials.icon', ['name' => 'user'])
                             <span class="d-none d-sm-inline">{{ auth()->user()->name }}</span>
                         </button>
@@ -53,9 +58,11 @@
                     </a>
                 @endauth
 
-                <a href="{{ route('cart.index') }}" class="btn btn-dark header-btn text-nowrap">
+                <a href="{{ route('cart.index') }}" class="btn btn-dark header-btn text-nowrap"
+                   aria-label="Giỏ hàng, {{ $cartCount }} sản phẩm">
                     @include('partials.icon', ['name' => 'cart'])
-                    Giỏ hàng <span class="badge text-bg-light">{{ $cartCount }}</span>
+                    <span class="d-none d-md-inline">Giỏ hàng</span>
+                    <span class="badge text-bg-light">{{ $cartCount }}</span>
                 </a>
             </div>
         </div>

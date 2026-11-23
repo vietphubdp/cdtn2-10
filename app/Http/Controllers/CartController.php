@@ -40,7 +40,10 @@ class CartController extends Controller
         }
 
         // Số trên icon giỏ ở header tự cập nhật vì đọc từ session
-        return back()->with('success', "Đã thêm \"{$product->name}\" vào giỏ hàng.");
+        return back()->with([
+            'success' => "Đã thêm \"{$product->name}\" vào giỏ hàng.",
+            'cart_added' => true,
+        ]);
     }
 
     public function update(UpdateCartRequest $request, int $productId, CartService $cart)

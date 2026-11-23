@@ -123,6 +123,7 @@ class CheckoutTest extends TestCase
         $this->get(route('checkout.success', $order->code))
             ->assertOk()
             ->assertSee('Đặt hàng thành công!')
+            ->assertSeeText('Theo dõi đơn hàng')
             ->assertSee($order->code)
             ->assertSee('Chờ xác nhận')
             ->assertSee('740.000đ')

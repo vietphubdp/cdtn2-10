@@ -14,9 +14,9 @@
             <div class="hero-banner h-100">
                 <div class="row g-4 align-items-center h-100">
                     <div class="col-md-8">
-                        <h1 class="display-title hero-title">Phụ kiện công nghệ hợp gu của bạn</h1>
+                        <h1 class="display-title hero-title">Phụ kiện công nghệ <em>hợp gu của bạn</em></h1>
                         <p class="hero-text">Tai nghe, sạc dự phòng, chuột, bàn phím… chính hãng, giá tốt mỗi ngày. Thanh toán khi nhận hàng.</p>
-                        <a href="{{ route('products.index') }}" class="btn btn-dark btn-lg px-5">Mua sắm ngay</a>
+                        <a href="{{ route('products.index') }}" class="btn btn-light btn-lg">Mua sắm ngay @include('partials.icon', ['name' => 'arrow-right', 'size' => 18])</a>
 
                         <div class="hero-stats d-flex">
                             <div>
@@ -36,8 +36,6 @@
 
                     <div class="col-md-4 d-none d-md-block">
                         <div class="hero-visual">
-                            <span class="hero-spark hero-spark-lg">@include('partials.icon', ['name' => 'sparkle', 'size' => 64])</span>
-                            <span class="hero-spark hero-spark-sm">@include('partials.icon', ['name' => 'sparkle', 'size' => 36])</span>
                             @forelse ($heroProducts as $product)
                                 <a href="{{ route('products.show', $product->slug) }}" class="hero-shot hero-shot-{{ $loop->iteration }}">
                                     <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
@@ -61,19 +59,38 @@
 
         {{-- Danh mục kèm số SP đang bán; bấm → /san-pham?category=<slug> --}}
         <div class="col-lg-4">
-            <div class="category-box h-100">
-                <h2 class="h6 fw-bold text-uppercase">Danh mục</h2>
-                <ul class="list-unstyled mb-0">
-                    @foreach ($categories as $category)
+            <section id="danh-muc" class="category-box" aria-label="Danh mục sản phẩm">
+                <ul class="category-list list-unstyled mb-0">
+                    @forelse ($visibleCategories as $category)
                         <li>
-                            <a href="{{ route('products.index', ['category' => $category->slug]) }}">
-                                <span>{{ $category->name }} ({{ $category->products_count }})</span>
-                                @include('partials.icon', ['name' => 'chevron-right', 'size' => 16])
+                            <a class="category-row" href="{{ route('products.index', ['category' => $category->slug]) }}">
+                                <span class="text-truncate">{{ $category->name }}</span>
+                                <small class="visually-hidden">{{ $category->products_count }} sản phẩm</small>
+                                @include('partials.icon', ['name' => 'chevron-right', 'size' => 20])
                             </a>
                         </li>
-                    @endforeach
+                    @empty
+                        <li class="p-3 text-secondary">Chưa có danh mục.</li>
+                    @endforelse
                 </ul>
-            </div>
+                @if ($categories->isNotEmpty())
+                    <nav class="category-pager" aria-label="Phân trang danh mục">
+                        <span aria-label="Trang {{ $categoryPage }} trên {{ $categoryPages }}">{{ $categoryPage }}/{{ $categoryPages }}</span>
+                        @foreach ([-1 => 'Trang trước', 1 => 'Trang sau'] as $step => $label)
+                            @php($target = $categoryPage + $step)
+                            @if ($target >= 1 && $target <= $categoryPages)
+                                <a class="category-step" href="{{ route('home', ['danh-muc' => $target]) }}#danh-muc" aria-label="{{ $label }}">
+                                    @include('partials.icon', ['name' => 'chevron-right', 'size' => 18])
+                                </a>
+                            @else
+                                <button class="category-step" type="button" disabled aria-label="{{ $label }}">
+                                    @include('partials.icon', ['name' => 'chevron-right', 'size' => 18])
+                                </button>
+                            @endif
+                        @endforeach
+                    </nav>
+                @endif
+            </section>
         </div>
     </div>
 
@@ -112,6 +129,9 @@
                         <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="bento-tile">
                             <span class="bento-name">{{ $category->name }}</span>
                             <span class="bento-count">{{ $category->products_count }} sản phẩm</span>
+                            @if ($cover = $category->products->first()?->image_url)
+                                <img class="bento-photo" src="{{ $cover }}" alt="" loading="lazy">
+                            @endif
                             <span class="bento-arrow">@include('partials.icon', ['name' => 'arrow-right', 'size' => 20])</span>
                         </a>
                     </div>

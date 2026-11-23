@@ -11,6 +11,9 @@
                 @else
                     <span class="d-flex align-items-center justify-content-center text-secondary">Chưa có ảnh</span>
                 @endif
+                @if ($product->is_on_sale)
+                    <span class="sale-badge">Sale</span>
+                @endif
             </div>
         </div>
 

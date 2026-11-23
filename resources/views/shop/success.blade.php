@@ -5,15 +5,19 @@
 @section('content')
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6 text-center">
-            <div class="success-icon display-4">✓</div>
+            <div class="success-icon display-4" aria-hidden="true">✓</div>
             <h1 class="h3 fw-bold">Đặt hàng thành công!</h1>
-            <p>Cảm ơn bạn đã mua hàng tại website. Shop sẽ gọi xác nhận trong thời gian sớm nhất.</p>
+            <div class="order-confirmation-next">
+                <span class="small text-secondary">Mã đơn hàng</span>
+                <strong class="order-confirmation-code">{{ $order->code }}</strong>
+                <p>Xem trạng thái xác nhận và giao hàng của đơn này.</p>
+                <a href="{{ route('orders.show', $order->code) }}" class="btn btn-dark">
+                    Theo dõi đơn hàng @include('partials.icon', ['name' => 'arrow-right', 'size' => 18])
+                </a>
+            </div>
 
             <div class="p-3 bg-white border rounded text-start mb-3">
                 <dl class="row mb-0">
-                    <dt class="col-sm-5 fw-normal">Mã đơn hàng</dt>
-                    <dd class="col-sm-7 text-sm-end fw-bold">{{ $order->code }}</dd>
-
                     <dt class="col-sm-5 fw-normal">Trạng thái</dt>
                     <dd class="col-sm-7 text-sm-end">
                         <span class="badge text-bg-{{ $order->status->color() }}">{{ $order->status->label() }}</span>
@@ -38,7 +42,6 @@
             </div>
 
             <div class="d-flex flex-wrap justify-content-center gap-2">
-                <a href="{{ route('orders.show', $order->code) }}" class="btn btn-dark">Xem chi tiết đơn hàng</a>
                 <a href="{{ route('products.index') }}" class="btn btn-outline-dark">Tiếp tục mua sắm</a>
             </div>
         </div>
